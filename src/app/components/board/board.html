@@ -1,11 +1,24 @@
-<div class="container">
-    @for (row of board; track row; let i = $index)
-    {
-        @for (sq of row; track sq; let j = $index)
-        {
-            <div [id]='board[i][j]'  
-            [ngClass]="(i + j) % 2 === 0 ? 'tile whiteTile' : 'tile blackTile'">
-            </div>
-        }
-    }
+<div class="layout">
+    <div class="board">
+        <!-- do something for alt? -->
+        <app-player-details-for-game 
+            [user] = 'opponent'
+        ></app-player-details-for-game>
+        <div class="container">
+            @for (row of board; track row; let i = $index)
+            {
+                @for (sq of row; track sq; let j = $index)
+                {
+                    <div [id]='board[i][j]'  
+                    [ngClass]="(i + j) % 2 === 0 ? 'tile whiteTile' : 'tile blackTile'">
+                    </div>
+                }
+            }
+        </div>
+        <app-player-details-for-game 
+            [user] = 'player'
+        ></app-player-details-for-game>
+    </div>
+    <app-game-tracker></app-game-tracker>
 </div>
+<app-request-confirmation [requestUser]="opponent"></app-request-confirmation>

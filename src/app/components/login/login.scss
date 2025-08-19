@@ -1,0 +1,29 @@
+input
+{
+    white-space: nowrap;
+}
+form
+{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 20px;
+}
+.form-group
+{
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+button:hover
+{
+    cursor: pointer;
+}
+.form-group small {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+}

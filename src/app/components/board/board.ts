@@ -1,15 +1,25 @@
-import { Component, OnInit, ViewEncapsulation, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { GameTracker } from '../game-tracker/game-tracker';
+import { Gamelogic } from '../../services/gamelogic';
+import { Client } from '../../services/client';
+import { PlayerDetailsForGame } from '../player-details-for-game/player-details-for-game';
+import { ActiveUserModel } from '../../models/active-user-model';
+import { RequestConfirmation } from '../request-confirmation/request-confirmation';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule],
+  imports: [CommonModule, GameTracker, PlayerDetailsForGame, RequestConfirmation],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class Board implements OnInit, AfterViewInit{
   board: string[][] = [];
+  @Input() opponent: ActiveUserModel = {username: 'Guest', userImg: 'example.png', score: null, id: ''}; 
+  player: ActiveUserModel = {username: 'Guest', userImg: 'example.png', score: null, id: ''};
+  constructor(private client:Client, private gamelogic:Gamelogic){}
   ngOnInit(): void {
+    this.player.username = this.client.getUserName();
     for (let i = 0; i< 8; i++)
     {
       if (!this.board[i])

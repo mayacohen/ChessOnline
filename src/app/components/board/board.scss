@@ -1,8 +1,19 @@
+.layout
+{
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
 .container
 {
     display: grid;
     grid-template-columns: repeat(8, 50px);
     grid-template-rows: repeat(8, 50px);
+}
+.board
+{
+    display: flex;
+    flex-direction: column;
 }
 .blackTile, .whiteTile
 {

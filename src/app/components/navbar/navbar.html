@@ -1,8 +1,10 @@
-<img src="logo.png"/>
+<img src="logo.png" alt="chess logo"/>
 <button>Play <i class="fa-solid fa-chess"></i></button>
-<button>Social<img src="people.png"/></button>
-<input type="text" placeholder="text" [(ngModel)]="searchQuery"/>
-<div>{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
+<button>Social<img src="people.png" alt="icon of people in blue"/></button>
+<div class="navbar-item" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
+<div class="navbar-item" (click)="isLoginModalOpen = !isLoginModalOpen;">Log In</div> 
+<input type="text" placeholder="search.." [(ngModel)]="searchQuery"/>
+<div class="navbar-item">{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
 @if (isSignupModalOpen)
 {
     <app-signup (closeModalEmitter)="closeSignupModal()"></app-signup>
@@ -10,4 +12,20 @@
 @if (isLoginModalOpen)
 {
     <app-login (closeModalEmitter)="closeLoginModal()"></app-login>
+}
+@if(isChatModalOpen)
+{
+    <app-chat [userChat]="userChat"
+            (closeChatModal)="closeChatModal()"></app-chat>
+}
+@if(isRequestGameModalOpen)
+{
+    <app-request-game-modal (closeModalEmitter)="closeGameRequestModal()">
+
+    </app-request-game-modal>
+}
+@if(isRequestConfirmation)
+{
+    <app-request-confirmation [requestUser]="userGame">
+    </app-request-confirmation>
 }

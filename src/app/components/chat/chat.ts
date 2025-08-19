@@ -3,6 +3,7 @@ import { MessageModel } from '../../models/message-model';
 import { CommonModule } from '@angular/common';
 import { Client } from '../../services/client';
 import { FormsModule } from '@angular/forms';
+import { LoggedInUserModel } from '../../models/logged-in-user-model';
 
 @Component({
   selector: 'app-chat',
@@ -11,8 +12,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './chat.scss'
 })
 export class Chat implements OnInit{
-  @Input() usernameCommunicatingWith = 'example.png';
-  @Input() imgUserCommunicatingWith = '';
+  @Input() userChat: LoggedInUserModel = {username : '', 
+    userImg: 'example.png', id:'', score:0}; 
   messages:MessageModel[] =[]; 
   userName:string = '';
   newMessageContent = '';

@@ -1,0 +1,17 @@
+:host
+{
+    width: 200px;
+    padding: 10px;
+}
+h3
+{
+    white-space: nowrap;
+    display: flex;
+    justify-self: center;
+}
+.tracking-row
+{
+    display: flex;
+    justify-content: space-between;
+    height: fit-content;
+}

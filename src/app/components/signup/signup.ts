@@ -3,7 +3,6 @@ import { FormGroup,FormsModule, FormBuilder,Validators,
    ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Client } from '../../services/client';
 import { SignUpModel } from '../../models/sign-up-model';
-import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'app-signup',
@@ -50,7 +49,6 @@ export class Signup implements OnInit{
   {
     if (this.signupForm.valid)
     {
-      const salt = bcrypt.genSaltSync(10);
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
@@ -62,8 +60,8 @@ export class Signup implements OnInit{
       {
         userName: this.signupForm.value.userName,
         email: this.signupForm.value.email,
-        password: bcrypt.hashSync(this.signupForm.value.password, salt),
-        confirmPassword: bcrypt.hashSync(this.signupForm.value.confirmPassword, salt),
+        password: this.signupForm.value.password,
+        confirmPassword: this.signupForm.value.confirmPassword,
         signedupDate: formatted
       }
       console.log(signupSubmission);

@@ -2,7 +2,6 @@ import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup,FormBuilder,ReactiveFormsModule,Validators } from '@angular/forms';
 import { Client } from '../../services/client';
 import { LoginModel } from '../../models/login-model';
-import * as bcrypt from 'bcryptjs';
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
@@ -32,11 +31,10 @@ export class Login implements OnInit{
   {
     if (this.loginForm.valid)
     {
-      const salt = bcrypt.genSaltSync(10);
       const signupSubmission : LoginModel =
       {
         userName: this.loginForm.value.userName,
-        password: bcrypt.hashSync(this.loginForm.value.password, salt),
+        password: this.loginForm.value.password,
       }
       console.log(signupSubmission);
       this.closeModal();
