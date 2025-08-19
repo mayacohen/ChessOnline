@@ -1,0 +1,38 @@
+/* You can add global styles to this file, and also import other style files */
+body, html
+{
+    margin: 0;
+    padding: 0;
+}
+.modal
+{
+    background-color: rgba(0,0,0,0.3);
+    position: absolute;
+    z-index: 100;
+    top:0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@mixin modal-content-base
+{
+    overflow: hidden;
+    position: relative;
+}
+.modal-content
+{
+    @include modal-content-base;
+    height: 400px;
+    width: 400px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    padding: 20px;
+}

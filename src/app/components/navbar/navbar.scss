@@ -1,0 +1,19 @@
+:host
+{
+    height: 100%;
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+}
+button
+{
+    img
+    {
+        height: 40px;
+        width: 30px;
+    }
+}
+button:hover
+{
+    cursor: pointer;
+}

@@ -1,0 +1,11 @@
+<div class="container">
+    @for (row of board; track row; let i = $index)
+    {
+        @for (sq of row; track sq; let j = $index)
+        {
+            <div [id]='board[i][j]'  
+            [ngClass]="(i + j) % 2 === 0 ? 'tile whiteTile' : 'tile blackTile'">
+            </div>
+        }
+    }
+</div>

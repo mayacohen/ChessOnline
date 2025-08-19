@@ -1,0 +1,34 @@
+.container
+{
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+}
+.blackTile, .whiteTile
+{
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.blackTile
+{
+    background-color: black;
+}
+.whiteTile
+{
+    background-color: white;
+}
+i
+{
+    font-size: 30px;
+}
+.blackPiece
+{
+    color: blueviolet;
+}
+.whitePiece
+{
+    color: rgb(214, 184, 242);
+}

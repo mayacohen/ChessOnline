@@ -1,0 +1,13 @@
+<img src="logo.png"/>
+<button>Play <i class="fa-solid fa-chess"></i></button>
+<button>Social<img src="people.png"/></button>
+<input type="text" placeholder="text" [(ngModel)]="searchQuery"/>
+<div>{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
+@if (isSignupModalOpen)
+{
+    <app-signup (closeModalEmitter)="closeSignupModal()"></app-signup>
+}
+@if (isLoginModalOpen)
+{
+    <app-login (closeModalEmitter)="closeLoginModal()"></app-login>
+}
