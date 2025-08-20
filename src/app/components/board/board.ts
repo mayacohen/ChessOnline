@@ -5,10 +5,9 @@ import { Gamelogic } from '../../services/gamelogic';
 import { Client } from '../../services/client';
 import { PlayerDetailsForGame } from '../player-details-for-game/player-details-for-game';
 import { ActiveUserModel } from '../../models/active-user-model';
-import { RequestConfirmation } from '../request-confirmation/request-confirmation';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, GameTracker, PlayerDetailsForGame, RequestConfirmation],
+  imports: [CommonModule, GameTracker, PlayerDetailsForGame],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None

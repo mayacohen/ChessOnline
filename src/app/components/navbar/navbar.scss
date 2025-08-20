@@ -1,7 +1,7 @@
 :host
 {
     height: 100%;
-    width: 100px;
+    width: var(--width-navbar);
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -25,4 +25,13 @@
 button:hover, .navbar-item:hover
 {
     cursor: pointer;
+}
+
+@media screen and (max-width:var(--width-shrink-navbar)){
+    :host
+    {
+        height: 70px;
+        width: 100%;
+        flex-direction: row; //hamburger menu
+    }    
 }

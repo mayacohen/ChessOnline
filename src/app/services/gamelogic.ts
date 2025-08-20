@@ -17,6 +17,20 @@ class Position
   {
     return this.col;
   }
+  isLegalPosition()
+  {
+    if (this.row >= 0 && this.row < 8 && this.col >= 0 && this.col < 8)
+      return true;
+    return false;
+  }
+  moveRow(change:number)
+  {
+    this.row+=change;
+  }
+  moveCol(change:number)
+  {
+    this.col+=change;
+  }
 }
 class MovePosition
 {
@@ -24,8 +38,8 @@ class MovePosition
   private newPos!: Position;
   constructor(oldPos: Position, newPos:Position)
   {
-    this.oldPos = oldPos;
-    this.newPos = newPos;
+    this.oldPos = new Position(oldPos.getRow(), oldPos.getCol());
+    this.newPos = new Position(newPos.getRow(), newPos.getCol());
   }
   getOldRow()
   {
@@ -102,6 +116,42 @@ class chessPiece
       return false;
     return true;
   }
+  checkDirection(
+  rowDelta : number,
+  colDelta : number,
+  currentPos: Position,
+  startPosition: Position,
+  isCheckBoard: boolean,
+  game: ChessGame, 
+  isOneStep: boolean
+  ): MovePosition[]
+  {
+    let moveResults: MovePosition[] = [];
+    currentPos.moveRow(rowDelta);
+    currentPos.moveCol(colDelta);
+    while (currentPos.isLegalPosition()) {
+      const moveToPiece = game.getPieceFromBoard(currentPos, isCheckBoard);
+      if (moveToPiece instanceof chessPiece) {
+        if (moveToPiece.getWhite() === this.getWhite()) break;
+        moveResults.push(new MovePosition(startPosition, new Position(currentPos.getRow(), currentPos.getCol())));
+        break;
+      }
+      moveResults.push(new MovePosition(startPosition, new Position(currentPos.getRow(), currentPos.getCol())));
+      if (isOneStep)
+        break;
+      currentPos.moveRow(rowDelta);
+      currentPos.moveCol(colDelta);
+    }
+    return this.returnLegalMoves(isCheckBoard, game, startPosition, moveResults);
+  }
+  public returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
+  {
+    if (moves === undefined)
+      return [];
+    return moves.filter(m =>
+      this.isLegalMovement(m, isCheckBoard, game)
+    );
+  }
 }
 class Rook extends chessPiece
 {
@@ -115,6 +165,20 @@ class Rook extends chessPiece
     }
     else
         super(isWhite);
+  }
+  override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
+  {
+    if (!(startPosition instanceof Position))
+      return [];
+    let moveResults: MovePosition[] = []; 
+    let currentPos!: Position;
+    const directions: [number, number][] = [ [-1, 0], [1, 0], [0, -1], [0, 1]];
+    for (const [rowDelta, colDelta] of directions) 
+    {
+      currentPos = new Position(startPosition.getRow(), startPosition.getCol());
+      moveResults.push(...super.checkDirection(rowDelta,colDelta, currentPos, startPosition, isCheckBoard, game, false)); 
+    }
+    return moveResults;
   }
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game:ChessGame): boolean {
     if (!positions.isSameRowOrCol() || !super.isLegalMovement(positions, isCheckBoard, game))
@@ -167,6 +231,29 @@ class Knight extends chessPiece
     else
         super(isWhite);
   }
+  override returnLegalMoves(isCheckBoard: boolean, game: ChessGame, startPosition?: Position, moves?: MovePosition[]): MovePosition[]
+  {
+   if (!(startPosition instanceof Position))
+      return [];
+    let moveResults: MovePosition[] = []; 
+    let currentPos!: Position;
+    const deltas: [number, number][] = [];
+    const steps = [-2, -1, 1, 2];
+    for (const dx of steps) {
+      for (const dy of steps) {
+        if (Math.abs(dx) !== Math.abs(dy)) {
+          deltas.push([dx, dy]);
+        }
+      }
+    }
+    for (const [rowDelta, colDelta] of deltas) 
+    {
+      currentPos = new Position(startPosition.getRow(), startPosition.getCol());
+      moveResults.push(...super.checkDirection(rowDelta,colDelta, currentPos, 
+        startPosition, isCheckBoard, game, true));  
+    }
+    return moveResults;
+  }
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean {
     const difC = positions.getColAbs(), difR = positions.getRowAbs();
     if ((difC === 1 && difR === 2) || (difC === 2 && difR === 1))
@@ -186,6 +273,21 @@ class Bishop extends chessPiece
         super(copyBishop.getWhite());
     else
         super(isWhite);
+  }
+  override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
+  {
+    if (!(startPosition instanceof Position))
+      return [];
+    let moveResults: MovePosition[] = []; 
+    let currentPos!: Position;
+    const directions: [number, number][] = [ [-1, -1], [1, 1], [1, -1], [-1, 1]];
+    for (const [rowDelta, colDelta] of directions) 
+    {
+      currentPos = new Position(startPosition.getRow(), startPosition.getCol());
+      moveResults.push(...super.checkDirection(rowDelta,colDelta, 
+        currentPos, startPosition, isCheckBoard, game, false));
+    }
+    return moveResults;
   }
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean {
     const difC = positions.getColAbs(), difR = positions.getRowAbs();
@@ -214,6 +316,13 @@ class Queen extends chessPiece
         super(copyQueen.getWhite());
     else
         super(isWhite);
+  }
+  override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[]) : MovePosition[]
+  {
+    const b: Bishop = new Bishop(super.getWhite()), r = new Rook(super.getWhite());
+    let returnVal :MovePosition[]  =  b.returnLegalMoves(isCheckBoard, game,startPosition,moves);
+    returnVal.push(...r.returnLegalMoves(isCheckBoard, game,startPosition,moves));
+    return returnVal;
   }
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean
   {
@@ -246,10 +355,34 @@ class Pawn extends chessPiece
   {
     this.isFirstMoveLastTurn = false;
   }
-    override getString()
+  override getString()
   {
     return 'P'+super.getString();
   }
+  override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[]) : MovePosition[]
+  {
+    if (!(startPosition instanceof Position))
+      return [];
+    const moveDirection = super.getWhite() ? 1 : -1; // white = 0, black = 7
+    let moveResult : MovePosition[] = [];
+    let checkPos = new Position(startPosition.getRow(), startPosition.getCol());
+    checkPos.moveRow(moveDirection);
+    if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos,isCheckBoard) === null)
+      moveResult.push(new MovePosition(startPosition, checkPos));
+    checkPos.moveRow(moveDirection);
+    if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos,isCheckBoard) === null && !this.hasMoved)
+      moveResult.push(new MovePosition(startPosition, checkPos));
+    checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()+1);
+    let piece = game.getPieceFromBoard(checkPos,isCheckBoard);
+    if (checkPos.isLegalPosition() && piece instanceof chessPiece && piece.getWhite() != this.getWhite())
+      moveResult.push(new MovePosition(startPosition, checkPos));
+    checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()-1);
+    piece = game.getPieceFromBoard(checkPos,isCheckBoard);
+    if ((checkPos.isLegalPosition() && piece instanceof chessPiece && piece.getWhite() != this.getWhite())||
+      (enpassant )) //continue tmrw
+      moveResult.push(new MovePosition(startPosition, checkPos));
+
+  } 
   constructor(isWhite:boolean, copyPawn?: Pawn)
   {
     if (copyPawn !== undefined && copyPawn !== null)
@@ -262,6 +395,7 @@ class Pawn extends chessPiece
     else
         super(isWhite);
   }
+
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean {
     if (!((super.getWhite() && positions.getNewRow() < positions.getOldRow()) ||
      (!super.getWhite() && positions.getNewRow() > positions.getOldRow())))

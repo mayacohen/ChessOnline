@@ -14,7 +14,7 @@ import { LoggedInUserModel } from '../../models/logged-in-user-model';
 export class Chat implements OnInit{
   @Input() userChat: LoggedInUserModel = {username : '', 
     userImg: 'example.png', id:'', score:0}; 
-  messages:MessageModel[] =[]; 
+  messages:MessageModel[] =[]; //do websocket implemantation
   userName:string = '';
   newMessageContent = '';
   @Output() closeChatModal = new EventEmitter<void>();

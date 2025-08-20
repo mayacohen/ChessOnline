@@ -1,2 +1,20 @@
 <app-navbar></app-navbar>
-<app-board></app-board>
+@if(isPlaying)
+{
+    <app-board></app-board>
+}
+@else
+{
+    <div class="container">
+        <h3>Play Chess</h3>
+        <h3>Connect with friends</h3>
+        <h2>Have fun!</h2>
+        <img src="logo.webp">
+        <button (click)="isRequestModalOpen = true;">Start</button>
+    </div>
+    @if(isRequestModalOpen)
+    {
+        <app-request-game-modal (resultEmitter)="handleGameRequestModal()">
+        </app-request-game-modal>
+    }
+}

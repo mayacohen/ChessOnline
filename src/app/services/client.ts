@@ -9,6 +9,10 @@ export class Client {
   {
     return this.userName;
   }
+  getLoggedInStatus()
+  {
+    return true;
+  }
   // get and send user details,
   // chess communication in chess logic?
 }

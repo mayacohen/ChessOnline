@@ -1,1 +1,28 @@
-<p>social works!</p>
+@if(isChatModalOpen)
+{
+    <app-chat [userChat]="userChat" (closeChatModal)='closeChatModal()'>
+    </app-chat>
+}
+@else
+{
+    <div class="modal" (click)="closeSocialModal()">
+        <div class="modal-content" (click)="unexpectedEventsHandler($event)">
+            <button class="close-btn" (click)="closeSocialModal()">
+                &times;
+            </button>
+            <div>send messages</div>
+            @for (user of loggedUsers; track user)
+            {
+                <div class="chatList" (click)="openChat(user)">
+                    <span [ngClass]="isUserActive(user)? greenClass : redClass">&bull;</span>
+                    <span>user.username</span>
+                </div>
+            }
+            @empty
+            {
+                <h3>Invite your friends to join!</h3>
+            }
+            <input type="text" placeholder="search for user"/>
+        </div>
+    </div> 
+}
