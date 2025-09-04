@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup,FormBuilder,ReactiveFormsModule,Validators } from '@angular/forms';
 import { Client } from '../../services/client';
 import { LoginModel } from '../../models/login-model';
@@ -9,6 +9,8 @@ import { LoginModel } from '../../models/login-model';
   styleUrl: './login.scss'
 })
 export class Login implements OnInit{
+  @ViewChild("modal") modalElement!: ElementRef;
+  @ViewChild("closeButton") closeButton!: ElementRef;
   loginForm!: FormGroup;
   @Output() closeModalEmitter = new EventEmitter<void>(); 
   constructor(private client:Client, private fb:FormBuilder){}
@@ -18,26 +20,30 @@ export class Login implements OnInit{
       password: ['', [Validators.required]]
     });
   }
-  closeModal()
+  closeModal(event : Event)
   {
-    this.closeModalEmitter.emit();
-  }
-  unexpectedEventsHandler(event:Event)
-  {
-    event.stopPropagation();
-    event.preventDefault();
+    if (event.target === this.modalElement.nativeElement || 
+      event.target === this.closeButton.nativeElement)
+      this.closeModalEmitter.emit();
   }
   onSubmit()
   {
     if (this.loginForm.valid)
     {
-      const signupSubmission : LoginModel =
+      const loginSubmission : LoginModel =
       {
         userName: this.loginForm.value.userName,
         password: this.loginForm.value.password,
       }
-      console.log(signupSubmission);
-      this.closeModal();
+      this.client.login(loginSubmission).subscribe({
+        next: token => {
+          this.client.setLoggedInStatus(true),
+          this.client.setUserName(loginSubmission.userName);
+          sessionStorage.setItem("accessToken", token);
+          this.closeModalEmitter.emit();
+        },
+        error: err => console.log(err)
+      });
     }
   }
 }

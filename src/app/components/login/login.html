@@ -1,6 +1,6 @@
-<div class="modal" (click)="closeModal()">
-  <div class="modal-content" (click)="unexpectedEventsHandler($event)">
-    <button class="close-btn" (click)="closeModal()">&times;</button>
+<div #modal class="modal" (click)="closeModal($event)">
+  <div class="modal-content">
+    <button #closeButton class="close-btn" (click)="closeModal($event)">&times;</button>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="userName">User Name: </label>
@@ -43,7 +43,7 @@
           }
         }
       </div>
-      <button type="submit" [disabled]="loginForm.invalid">
+      <button type="submit" class ="fancy-text form-button" [disabled]="loginForm.invalid">
         Submit
       </button>
     </form>

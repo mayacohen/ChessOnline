@@ -2,8 +2,14 @@
 <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
 <button class="fancy-text" (click) = 'handleSocial()'>Social<img src="people.png" alt="icon of people in blue"/></button>
 <div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
-<div class="navbar-item fancy-text" (click)="isLoginModalOpen = !isLoginModalOpen;">Log In</div> 
-<input type="text" placeholder="search.." [(ngModel)]="searchQuery"/>
+<div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
+<div class="search-container">
+    <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>
+    @if(isSearchModalOpen === true)
+    {
+        <app-search-modal [userList]="userList"></app-search-modal>
+    }
+</div>
 <div class="navbar-item">{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
 @if (isSignupModalOpen)
 {

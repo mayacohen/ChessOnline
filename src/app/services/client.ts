@@ -3,19 +3,32 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ReturnTokensModel } from '../models/return-tokens-model';
 import { SignUpModel } from '../models/sign-up-model';
+import { LoginModel } from '../models/login-model';
+import { ReturnLoggedUsersModel } from '../models/return-logged-users-model';
+import { ClientMessageModel } from '../models/client-message-model';
+import { ClientConversationModel } from '../models/client-conversation-model';
 @Injectable({
   providedIn: 'root'
 })
 export class Client {
   private http = inject(HttpClient);
   private userName:string = 'guest';
+  private isLogged = false;
   getUserName()
   {
     return this.userName;
   }
   getLoggedInStatus()
   {
-    return true;
+    return this.isLogged;
+  }
+  setLoggedInStatus(isLogged: boolean)
+  {
+    this.isLogged = isLogged; 
+  }
+  setUserName(name:string)
+  {
+    this.userName = name;
   }
   serverUrl = "https://localhost:7070/";
 
@@ -27,7 +40,27 @@ export class Client {
   {
     return this.http.post<void>(this.serverUrl+"Register", signUp)
   }
-   
+  public login(login: LoginModel): Observable<string>
+  {
+    return this.http.post<string>(this.serverUrl+"Login", login, 
+      { responseType: 'text' as 'json'});
+  }
+  public search(query:string): Observable<(string | null)[] | null>
+  {
+    return this.http.get<(string | null)[] | null>(this.serverUrl+"Search/"+query);
+  }
+  public getLoggedUsersForChat():Observable<ReturnLoggedUsersModel[] | null>
+  {
+    return this.http.get< ReturnLoggedUsersModel[] | null>(this.serverUrl + "LoggedUsers");
+  }
+  public sendMessageToUser(message: ClientMessageModel):Observable<void>
+  {
+    return this.http.post<void>(this.serverUrl,message);
+  }
+  public getConversationWithParter(partner:string):Observable<ClientConversationModel>
+  {
+    return  this.http.get<ClientConversationModel>(this.serverUrl+"Chat/"+partner);
+  }
   // get and send user details,
   // chess communication in chess logic?
 }

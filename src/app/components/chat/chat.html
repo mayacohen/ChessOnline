@@ -1,6 +1,6 @@
-<div class="modal" (click)="closeModal()">
-    <div class="modal-content-chat" (click)="unexpectedEventsHandler($event)">
-        <button class="closeButtonChat" (click)="closeModal()">
+<div class="modal" #modal (click)="closeModal($event)">
+    <div class="modal-content-chat">
+        <button class="closeButtonChat" #closeButton (click)="closeModal($event)">
             <i class="fa-solid fa-arrow-left"></i>
         </button>
         <div class="user-messaging">
@@ -10,16 +10,16 @@
         <div class="messageContainer">
             @for(message of messages; track message)
             {
-                <div 
-                [ngClass]="message.fromUserName === userName? 'sent-messages' : 
+                <div class="message" 
+                [ngClass]="message.recieverUserName !== userName? 'sent-messages' : 
                 'recieved-messages'">{{message.content}}
-                <p>{{message.messegeDate}}</p>
+                <p>{{message.date}}</p>
                 </div>
             }
         </div>
         <div class="send-new-message-container">
             <input type="text" placeholder="Message" [(ngModel)]="newMessageContent"/>
-            <button class="sendButton">
+            <button class="sendButton" (click)="sendMessage()">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>

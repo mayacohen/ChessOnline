@@ -1,8 +1,10 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, 
+  ChangeDetectorRef} from '@angular/core';
 import { Chat } from '../chat/chat';
-import { LoggedInUserModel } from '../../models/logged-in-user-model';
 import { CommonModule } from '@angular/common';
-import { ActiveUserModel } from '../../models/active-user-model';
+import { ReturnLoggedUsersModel } from '../../models/return-logged-users-model';
+import { LoggedInUserModel } from '../../models/logged-in-user-model';
+import { Client } from '../../services/client';
 @Component({
   selector: 'app-social',
   imports: [Chat, CommonModule],
@@ -12,33 +14,39 @@ import { ActiveUserModel } from '../../models/active-user-model';
 export class Social implements OnInit{
   isChatModalOpen = false;
   @Output() closeSocial = new EventEmitter<void>();
-  loggedUsers: LoggedInUserModel[] = [];
-  activeUsers: ActiveUserModel[] = []; 
+  loggedUsers: ReturnLoggedUsersModel[] | null = [];
   greenClass = 'green-class';
   redClass = 'red-class'
   userChat: LoggedInUserModel = {username : '', 
-    userImg: 'example.png', id:'', score:0};  
+    userImg: 'example.png', id:'', score:0};
+  emptyMessage = "Loading Users..";
+
+  constructor(private client:Client, private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
-    //get users - logged and active, set logged users as active or inactive
+    this.client.getLoggedUsersForChat().subscribe({
+      next: res => 
+        {
+          this.loggedUsers = res;
+          this.emptyMessage = "Invite your friends to join!";
+          this.cdr.detectChanges();
+        },
+      error: err => console.log(err) 
+    });
   }
   closeChatModal()
   {
     this.isChatModalOpen = false;
-  }
-  isUserActive(user:LoggedInUserModel)
-  {
-    if (this.activeUsers.find(u => u.username == user.username) !== undefined)
-      return true;
-    return false;
   }
   unexpectedEventsHandler(event:Event)
   {
     event.stopPropagation();
     event.preventDefault();
   }
-  openChat(user:LoggedInUserModel)
+  openChat(user:ReturnLoggedUsersModel)
   {
-    this.userChat = user;
+    this.userChat.username = user.userName, 
+    this.userChat.userImg = 'example.png',
+    this.userChat.score = user.score === null ? 0 : user.score 
     this.isChatModalOpen = true;
   }
   closeSocialModal()

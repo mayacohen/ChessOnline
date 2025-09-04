@@ -79,9 +79,4 @@ export class Signup implements OnInit{
       event.target === this.closeButton.nativeElement)
       this.closeModalEmitter.emit();
   }
-  unexpectedEventsHandler(event:Event)
-  {
-    event.stopPropagation();
-    event.preventDefault();
-  }
 }
