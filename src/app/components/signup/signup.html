@@ -1,6 +1,7 @@
-<div class="modal" (click)="closeModal()">
-  <div class="modal-content" (click)="unexpectedEventsHandler($event)">
-    <button class="close-btn" (click)="closeModal()">&times;</button>
+<div #modal class="modal" (click)="closeModal($event)">
+  <div class="modal-content">
+    <!-- (click)="unexpectedEventsHandler($event)" -->
+    <button class="close-btn" #closeButton (click)="closeModal($event)">&times;</button>
     <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="userName">User Name: </label>
@@ -109,7 +110,7 @@
           }
         }
       </div>
-      <button type="submit" [disabled]="signupForm.invalid">
+      <button type="submit" class="fancy-text" [disabled]="signupForm.invalid">
         Submit
       </button>
     </form>

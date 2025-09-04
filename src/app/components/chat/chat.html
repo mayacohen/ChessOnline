@@ -1,6 +1,8 @@
 <div class="modal" (click)="closeModal()">
     <div class="modal-content-chat" (click)="unexpectedEventsHandler($event)">
-        <button class="closeButtonChat" (click)="closeModal()">&times;</button>
+        <button class="closeButtonChat" (click)="closeModal()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
         <div class="user-messaging">
             <h3>{{userChat.username}}</h3>
             <img [src]='userChat.userImg'/>

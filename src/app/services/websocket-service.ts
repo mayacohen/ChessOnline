@@ -9,7 +9,7 @@ export class WebsocketService {
   private socket$: WebSocketSubject<any>;
   // private socket!: WebSocket;
   constructor() {
-    this.socket$ = webSocket('ws://your-websocket-url');
+    this.socket$ = webSocket('wss://localhost:7070/ws');
   }
   // Send a message to the server
   sendMessage(message: any) {
@@ -25,7 +25,7 @@ export class WebsocketService {
   }
   // connect() {
   //   if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
-  //     this.socket = new WebSocket('ws://localhost:3000');
+  //     this.sthis.socket$ocket = new WebSocket('ws://localhost:3000');
   //   }
   // }
 

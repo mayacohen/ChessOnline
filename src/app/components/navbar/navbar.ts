@@ -25,7 +25,7 @@ export class Navbar {
   currentUI = this.lightUI;
   userChat: LoggedInUserModel = {username : '', 
       userImg: 'example.png', id:'', score:0};  
-  searchQuery='';
+  searchQuery=''; //search for users
   constructor(private client:Client){}
   closeSignupModal()
   {

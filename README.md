@@ -113,7 +113,7 @@ light/dark ui
 search (all)
 signup google/facebook
 chat during game
-rest of chess rules
+rest of chess rules -- mostly done
 themes
 
 server:
@@ -130,3 +130,10 @@ game history
 
 -messages: 
 to, from, date, message id
+  <div
+      class="example-box"
+      cdkDrag
+      [cdkDragDisabled]="item.disabled">{{item.value}}</div>
+ in message error (in Chat) make sure to roll back the message if error
+
+ copy models

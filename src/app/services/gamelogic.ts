@@ -87,8 +87,16 @@ class MovePosition
   {
     return this.newPos;
   } 
+  getRowMax()
+  {
+    return Math.max(this.getNewRow(),this.getOldRow());
+  }
+  getColMax()
+  {
+    return Math.max(this.getNewCol(),this.getOldCol());
+  }
 }
-class chessPiece
+abstract class ChessPiece
 {
   private isWhite!:boolean;
   constructor(isWhite:boolean)
@@ -131,7 +139,7 @@ class chessPiece
     currentPos.moveCol(colDelta);
     while (currentPos.isLegalPosition()) {
       const moveToPiece = game.getPieceFromBoard(currentPos, isCheckBoard);
-      if (moveToPiece instanceof chessPiece) {
+      if (moveToPiece instanceof ChessPiece) {
         if (moveToPiece.getWhite() === this.getWhite()) break;
         moveResults.push(new MovePosition(startPosition, new Position(currentPos.getRow(), currentPos.getCol())));
         break;
@@ -152,19 +160,14 @@ class chessPiece
       this.isLegalMovement(m, isCheckBoard, game)
     );
   }
+  abstract copy(): ChessPiece;
 }
-class Rook extends chessPiece
+class Rook extends ChessPiece
 {
   private hasMoved : boolean = false;
-  constructor(isWhite: boolean, copyRook?: Rook)
+  constructor(isWhite: boolean)
   {
-    if (copyRook !== undefined && copyRook !== null)
-    {
-        super(copyRook.getWhite());
-        this.hasMoved = copyRook.getMoved();
-    }
-    else
-        super(isWhite);
+    super(isWhite);
   }
   override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
   {
@@ -217,8 +220,13 @@ class Rook extends chessPiece
   {
     return 'R'+super.getString();
   }
+  override copy(): ChessPiece {
+    let rook = new Rook(this.getWhite());
+    rook.hasMoved = this.hasMoved;
+    return rook;
+  }
 }
-class Knight extends chessPiece
+class Knight extends ChessPiece
 {
   override getString()
   {
@@ -226,10 +234,10 @@ class Knight extends chessPiece
   }
   constructor(isWhite:boolean, copyKnight?: Knight)
   {
-    if (copyKnight !== undefined && copyKnight !== null)
-        super(copyKnight.getWhite());
-    else
-        super(isWhite);
+    super(isWhite);
+  }
+  override copy(): ChessPiece {
+    return new Knight(this.getWhite());
   }
   override returnLegalMoves(isCheckBoard: boolean, game: ChessGame, startPosition?: Position, moves?: MovePosition[]): MovePosition[]
   {
@@ -261,18 +269,18 @@ class Knight extends chessPiece
     return false;
   }
 }
-class Bishop extends chessPiece
+class Bishop extends ChessPiece
 {
     override getString()
   {
     return 'B'+super.getString();
   }
-  constructor(isWhite:boolean, copyBishop?: Bishop)
+  constructor(isWhite:boolean)
   {
-    if (copyBishop !== undefined && copyBishop !== null)
-        super(copyBishop.getWhite());
-    else
-        super(isWhite);
+    super(isWhite);
+  }
+  override copy(): ChessPiece {
+    return new Bishop(this.getWhite());
   }
   override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
   {
@@ -304,18 +312,18 @@ class Bishop extends chessPiece
     return false;
   }
 }
-class Queen extends chessPiece
+class Queen extends ChessPiece
 {
   override getString()
   {
     return 'Q'+super.getString();
   }
-  constructor(isWhite:boolean, copyQueen?: Queen)
+  constructor(isWhite:boolean)
   {
-    if (copyQueen !== undefined && copyQueen !== null)
-        super(copyQueen.getWhite());
-    else
-        super(isWhite);
+    super(isWhite);
+  }
+  override copy(): ChessPiece {
+    return new Queen(this.getWhite());
   }
   override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[]) : MovePosition[]
   {
@@ -333,24 +341,15 @@ class Queen extends chessPiece
     return false;
   }
 }
-class Pawn extends chessPiece
+class Pawn extends ChessPiece
 {
   private hasMoved = false;
   private isFirstMoveLastTurn = false;
-  private diedToEnPassant = false;
   setMoved()
   {
     this.hasMoved = true;
     this.isFirstMoveLastTurn = true;
   }  
-  setDiedToEnPassant()
-  {
-    this.diedToEnPassant = true;
-  }
-  getDiedToEnPassant()
-  {
-    return this.diedToEnPassant;
-  }
   setHasMovedTurn()
   {
     this.isFirstMoveLastTurn = false;
@@ -374,28 +373,25 @@ class Pawn extends chessPiece
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()+1);
     let piece = game.getPieceFromBoard(checkPos,isCheckBoard);
-    if (checkPos.isLegalPosition() && piece instanceof chessPiece && piece.getWhite() != this.getWhite())
+    if ((checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game)))
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()-1);
     piece = game.getPieceFromBoard(checkPos,isCheckBoard);
-    if ((checkPos.isLegalPosition() && piece instanceof chessPiece && piece.getWhite() != this.getWhite())||
-      (enpassant )) //continue tmrw
+    if (checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game))
       moveResult.push(new MovePosition(startPosition, checkPos));
-
+    return moveResult;
   } 
-  constructor(isWhite:boolean, copyPawn?: Pawn)
+  constructor(isWhite:boolean)
   {
-    if (copyPawn !== undefined && copyPawn !== null)
-    {
-        super(copyPawn.getWhite());
-        this.diedToEnPassant = copyPawn.diedToEnPassant;
-        this.hasMoved = copyPawn.hasMoved;
-        this.isFirstMoveLastTurn = copyPawn.isFirstMoveLastTurn;
-    }
-    else
-        super(isWhite);
+    super(isWhite);
   }
-
+  override copy():ChessPiece
+  {
+    let pawn = new Pawn(this.getWhite());
+    pawn.hasMoved = this.hasMoved;
+    pawn.isFirstMoveLastTurn = this.isFirstMoveLastTurn;
+    return pawn;
+  } 
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean {
     if (!((super.getWhite() && positions.getNewRow() < positions.getOldRow()) ||
      (!super.getWhite() && positions.getNewRow() > positions.getOldRow())))
@@ -412,16 +408,13 @@ class Pawn extends chessPiece
       const pawn = game.getPieceFromBoard(new Position(positions.getNewRow(), positions.getOldCol()), isCheckBoard) as Pawn;
       if (pawn.getWhite() !== super.getWhite() && pawn.isFirstMoveLastTurn && ((super.getWhite() && positions.getOldRow() === 3) ||
       (!super.getWhite() && positions.getOldRow() === 4)))
-      {
-        pawn.diedToEnPassant = true;
         return super.isLegalMovement(positions, isCheckBoard, game);
-      }
       return false;
     }
     return false;
   }
 }
-class King extends chessPiece
+class King extends ChessPiece
 {
   private hasMoved = false;
   setMoved()
@@ -436,16 +429,55 @@ class King extends chessPiece
   {
     return 'K'+super.getString();
   }
-  constructor(isWhite: boolean, copyKing?: King)
+  constructor(isWhite: boolean)
   {
-    if (copyKing !== undefined && copyKing !== null)
-    {
-        super(copyKing.getWhite());
-        this.hasMoved = copyKing.getMoved();
-    }
-    else
-        super(isWhite);
+    super(isWhite);
   }
+  override copy(): ChessPiece {
+    let king = new King(this.getWhite());
+    king.hasMoved = this.hasMoved;
+    return king;
+  }
+  override returnLegalMoves(isCheckBoard: boolean, game: ChessGame, startPosition?: Position, moves?: MovePosition[]): MovePosition[] {
+    if (startPosition === undefined)
+      return [];
+    let returnMoves : MovePosition[] = [];
+    for (let i = -1; i<= 1; i++)
+    {
+      for (let j = -1; j<= 1; j++)
+      {
+        if (new Position(startPosition.getRow()+i, startPosition.getCol()+j).isLegalPosition() &&
+        this.isLegalMovement(new MovePosition(startPosition,
+        new Position(startPosition.getRow()+i, startPosition.getCol()+j)), isCheckBoard, game))
+          returnMoves.push(new MovePosition(startPosition,new Position(startPosition.getRow()+i, startPosition.getCol()+j)));
+      }
+    }
+    if (!this.hasMoved) // castling - not checking if threatened (in game)
+    {
+      if (this.isCastlingLegal(0, startPosition, game, isCheckBoard))
+        returnMoves.push(new MovePosition(startPosition, new Position(startPosition.getRow(), 2)));
+      if (this.isCastlingLegal(7, startPosition, game, isCheckBoard))
+        returnMoves.push(new MovePosition(startPosition, new Position(startPosition.getRow(), 6)));
+    }
+    return returnMoves;
+  }
+  isCastlingLegal(col:number, pos:Position, game: ChessGame, isCheckBoard: boolean) : boolean
+  {
+    const r = game.getPieceFromBoard(new Position(pos.getRow(),
+      col),isCheckBoard);
+    if (r instanceof Rook && r.getMoved())
+    {
+      const min = Math.min(pos.getCol(), col), max = Math.max(pos.getCol(), col);
+      for (let i = min+1; i < max; i++)
+      {
+        if (game.getPieceFromBoard(new Position(pos.getRow(), i), isCheckBoard) !== null)
+          return false;
+      }
+      return true;
+    }
+    return false;
+  }
+  //honestly remove is legal movement this is for server
   override isLegalMovement(positions: MovePosition, isCheckBoard: boolean, game: ChessGame): boolean {
     if (positions.getRowAbs() <= 1 && positions.getRowAbs() <= 1)
       return super.isLegalMovement(positions, isCheckBoard, game);
@@ -454,7 +486,7 @@ class King extends chessPiece
       const rook =  game.getPieceFromBoard(positions.getNewPos(),isCheckBoard) as Rook;
       if (!rook.getMoved() && rook.getWhite() === super.getWhite())
       {
-        //for () king not threatented
+        //for () king not threatented TODO
         return true;
       }
     }
@@ -463,13 +495,11 @@ class King extends chessPiece
 }
 class ChessGame
 {
-  private board!: (chessPiece | null)[][];
-  private checkBoard!: (chessPiece | null)[][];
+  private board!: (ChessPiece | null)[][];
+  private checkBoard!: (ChessPiece | null)[][];
   private isWhiteTurn: boolean = true;
   private isWhitePlayer!: boolean;
-  private numOfMovesSincePawnOrEating = 0;
-
-  getPieceFromBoard(pos: Position, isCheckBoard:boolean): (chessPiece | null)
+  getPieceFromBoard(pos: Position, isCheckBoard:boolean): (ChessPiece | null)
   {
     if (pos.getRow() >= 0 && pos.getRow() < 8 && pos.getCol() >= 0 && pos.getCol() < 8)
     {
@@ -481,7 +511,7 @@ class ChessGame
     console.log('bug');
     return null;
   }
-  getNewElem():chessPiece | null
+  getNewElem():ChessPiece | null //??
   {
     return null;
   }
@@ -497,7 +527,7 @@ class ChessGame
       const isWhite = i<3? false : true; 
       for( let j = 0; j< 8; j++)
       {
-        let elem!: chessPiece | null;
+        let elem!: ChessPiece | null;
         if (i >= 2 && i < 6)
           elem = null;
         else if (i==1 || i==6)
@@ -521,42 +551,239 @@ class ChessGame
       }
     }
   }
-  setMoveOpposition(movePosition: MovePosition)
+  setMovePlayer(movePosition: MovePosition)
   {
-    if (this.getPieceFromBoard(movePosition.getOldPos(), false)?.getWhite() === null || 
-    this.getPieceFromBoard(movePosition.getOldPos(), false)?.getWhite() === this.isWhitePlayer)
+    if (this.getPieceFromBoard(movePosition.getOldPos(), false)?.getWhite()
+       !== this.isWhitePlayer)
     {
       console.log('bug');
       return;
     }
-    if ((this.getPieceFromBoard(movePosition.getOldPos(), false) instanceof King || 
-    this.getPieceFromBoard(movePosition.getNewPos(), false) instanceof King) &&
-    (this.getPieceFromBoard(movePosition.getOldPos(), false) instanceof Rook || 
-    this.getPieceFromBoard(movePosition.getNewPos(), false) instanceof Rook) &&
-    this.getPieceFromBoard(movePosition.getOldPos(), false)?.getWhite() ===
-     this.getPieceFromBoard(movePosition.getNewPos(), false)?.getWhite()) 
-    {
-      //not correct, they move in middle - {c,d} | {f,g}
-    }   
-    //en passant
-    //do move
-    //promotion
-    //save history
-  }
-  getLegalMoveForPiece() : string[]
+    this.setMove(movePosition);
+  } 
+  private setMove(movePosition: MovePosition)
   {
-    //check if it's a piece of your side and if it's islegal for piece
-    //then check if it's threatented
-    //if legal then send a message to rival
-    //check for win, draw 
-    return [''];
+    const piece = this.getPieceFromBoard(movePosition.getOldPos(), false);
+    if (piece === null)
+    {
+      console.log('bug');
+      return;
+    }
+    const isLegalMove =  piece.returnLegalMoves(false, this, movePosition.getOldPos()).filter(m =>
+      m.getNewRow() === movePosition.getNewRow() &&
+      m.getNewCol() === movePosition.getNewCol()
+    )
+    if (isLegalMove !== undefined)
+    {
+      if (piece instanceof Pawn && movePosition.getColAbs() === 1 && 
+      movePosition.getRowAbs() === 1 && 
+      this.getPieceFromBoard(movePosition.getNewPos(), false) === null)
+        this.board[movePosition.getNewRow()][movePosition.getOldCol()] = null;
+      if (piece instanceof King && movePosition.getColAbs() === 2)
+      {
+        let rook;
+        if (movePosition.getOldCol() > movePosition.getNewRow())
+        {
+          rook = this.checkBoard[movePosition.getOldRow()][0];
+          this.checkBoard[movePosition.getOldRow()][0] = null;
+        }
+        else
+        {
+          rook = this.checkBoard[movePosition.getOldRow()][7];
+          this.checkBoard[movePosition.getOldRow()][7] = null;
+        }
+        this.checkBoard[movePosition.getOldRow()][movePosition.getOldCol()+ 
+        (movePosition.getNewCol()-movePosition.getOldCol())/2] =  rook;
+        if (rook instanceof Rook)
+        {
+          rook.setMoved();
+          piece.setMoved();
+        }
+      }
+      if (piece instanceof Pawn)
+        piece.setMoved();
+      this.board[movePosition.getNewRow()][movePosition.getNewCol()] = 
+      this.board[movePosition.getOldRow()][movePosition.getOldCol()];
+      this.board[movePosition.getOldRow()][movePosition.getOldCol()] = null;  
+    }
+  }
+  private setCheckBoard()
+  {
+    for (let i = 0; i< 8; i++)
+    {
+      for (let j=0; j<8; j++)
+      {
+        const piece = this.board[i][j];
+        if (piece != null)
+          this.checkBoard[i][j] = piece.copy();
+        else
+          this.checkBoard[i][j] = null;
+      }
+    }
+  }
+  setMoveOpposition(movePosition: MovePosition)
+  {
+    if (this.getPieceFromBoard(movePosition.getOldPos(), false)?.getWhite()
+       === this.isWhitePlayer)
+    {
+      console.log('bug');
+      return;
+    }
+    this.setMove(movePosition);
+  }
+  isMoveLeadToCheck(move:MovePosition) : boolean 
+  {
+    if (move.getNewPos() === null)
+    {
+      console.log('error');
+      return true;
+    }
+    this.setCheckBoard();
+    const piece = this.getPieceFromBoard(move.getOldPos(), false);
+    const toEat = this.getPieceFromBoard(move.getNewPos(), false);
+    if (piece instanceof Pawn && move.getColAbs() === 1 &&
+    move.getRowAbs() === 1 && toEat === null)
+      this.checkBoard[move.getNewRow()][move.getOldCol()] = null;
+    if (piece instanceof King && move.getColAbs() === 2)
+    {
+      if (!this.isInCheck())
+        return false;
+      //check recorsive
+      this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()] = null;
+      this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()+ 
+        (move.getNewPos().getCol()-move.getOldPos().getCol())/2] = piece;
+      piece.setMoved();
+      if (!this.isInCheck())
+        return false;
+      let rook;
+      if (move.getNewCol() > move.getOldCol())
+      {
+        rook = this.checkBoard[move.getOldPos().getRow()][7];
+        this.checkBoard[move.getOldPos().getRow()][7] = null;
+      } 
+      else
+      {
+        rook = this.checkBoard[move.getOldPos().getRow()][0];
+        this.checkBoard[move.getOldPos().getRow()][0] = null;
+      }
+      this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()+ 
+        (move.getNewPos().getCol()-move.getOldPos().getCol())/2] = rook;
+      if (rook instanceof Rook)
+        rook.setMoved();
+      this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()] = piece;
+      this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()+ 
+        (move.getNewPos().getCol()-move.getOldPos().getCol())/2]
+    }
+    this.checkBoard[move.getNewPos().getRow()][move.getNewPos().getCol()]= piece;
+    this.checkBoard[move.getNewPos().getRow()][move.getNewPos().getCol()] = null;
+    return this.isInCheck();
+  }
+  isInCheck():boolean
+  {
+    let kingPosition!: Position;
+    for (let i = 0; i< 8; i++)
+    {
+      for (let j = 0; j < 8; j++)
+      {
+        if (this.checkBoard[i][j] instanceof King && 
+          this.checkBoard[i][j]?.getWhite() === this.isWhitePlayer)
+          kingPosition = new Position(i, j);
+      }
+    }
+    if (kingPosition === undefined)
+      console.log('missing king');
+   for (let i = 0; i< 8; i++)
+    {
+      for (let j = 0; j < 8; j++)
+      {
+        if (this.checkBoard[i][j] instanceof ChessPiece &&
+          this.checkBoard[i][j]?.getWhite() !== this.isWhitePlayer
+          && this.checkBoard[i][j]?.returnLegalMoves(true, this, new Position(i,j)).filter(m =>
+            m.getNewRow() === kingPosition.getRow() && m.getOldCol() === kingPosition.getCol()) !== undefined)
+         {
+          console.log('winning move: from',i,j+"to "+ kingPosition.getRow()+ kingPosition.getCol());
+          return false;
+         }
+      }
+    }
+    return true;
+  }
+  getMovesForPiece(startPosition: Position): MovePosition[] | null
+  {
+    const piece = this.getPieceFromBoard(startPosition,false);
+    let movesToCheck : MovePosition[] = [];
+    if ((this.isWhiteTurn !== this.isWhitePlayer) || 
+    piece === null || piece.getWhite() !== this.isWhitePlayer)
+      return null;
+    movesToCheck.push(...piece.returnLegalMoves(false, this, startPosition));
+    return movesToCheck.filter(m => !this.isMoveLeadToCheck(m));
+  }
+  //checkValidityCastling(startPosition: Position, )
+
+}
+export class Utility
+{
+  static numToStandard(pos:Position): string
+  {
+    return String.fromCharCode(pos.getCol()+parseInt('A'))
+    +String.fromCharCode(8-pos.getRow());
+  }
+  static standardToNum(code:string):Position
+  {
+    const col = parseInt(code[0])-parseInt('A');
+    return new Position(8-parseInt(code[1]),col);
+  }
+  static movePositionsToString(moves: MovePosition[]): string[]
+  {
+    let res: string[] = [];
+    moves.forEach(move =>
+    {
+      res.push(this.numToStandard(move.getOldPos())
+      +this.numToStandard(move.getNewPos()));
+    });
+    return res;
   }
 }
-
 //class utility to translate string to idc.
 @Injectable({
   providedIn: 'root'
 })
 export class Gamelogic {
+  game!: ChessGame;
+  listOfPossibleMoves!: MovePosition[] | null;
+  startNewGame(isWhitePlayer:boolean)
+  {
+    this.game = new ChessGame(isWhitePlayer);
+  }
+  getMovesForPiece(code:string) : null | string[]
+  {
+    this.listOfPossibleMoves = this.game.getMovesForPiece(Utility.standardToNum(code));
+    if (this.listOfPossibleMoves === null)
+      return null;
+    return Utility.movePositionsToString(this.listOfPossibleMoves);
+  }
+  setMove(code:string)
+  {
+    const move = new MovePosition(Utility.standardToNum(code[0]+code[1]),Utility.standardToNum(code[2]+code[3]));
+    if (this.listOfPossibleMoves?.filter(
+      m=>
+        m.getOldCol() === move.getOldCol()&&
+        m.getOldRow() === move.getOldRow() &&
+        m.getNewCol() === move.getNewCol() &&
+        m.getNewRow() === move.getNewRow()
+    ) !== undefined)
+      this.game.setMovePlayer(move);
+      //send server move
+  }
 
+  //white row 0,1. black rows 6,7.
+  //col 3-q,4-k 
+  //promotion, win, lose, draw - special message
+    //if castling move two, if enpassant kill the other pawn.
+       
+    //en passant
+    //do move
+    //promotion
+    //save history
+  //info from server: move, promotion, win, lose, draw  
 }

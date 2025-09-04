@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup,FormsModule, FormBuilder,Validators,
    ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Client } from '../../services/client';
@@ -11,6 +11,8 @@ import { SignUpModel } from '../../models/sign-up-model';
   styleUrl: './signup.scss'
 })
 export class Signup implements OnInit{
+  @ViewChild("modal") modalElement!: ElementRef;
+  @ViewChild("closeButton") closeButton!: ElementRef;
   signupForm!: FormGroup;
   @Output() closeModalEmitter = new EventEmitter<void>(); 
   constructor(private client:Client, private fb:FormBuilder){}
@@ -64,13 +66,18 @@ export class Signup implements OnInit{
         confirmPassword: this.signupForm.value.confirmPassword,
         signedupDate: formatted
       }
-      console.log(signupSubmission);
-      this.closeModal();
+      this.client.register(signupSubmission).subscribe({
+        next: () => console.log('works'),
+        error: err => console.log(err)
+      });
+      this.closeModalEmitter.emit();
     }
   }
-  closeModal()
+  closeModal(event : Event)
   {
-    this.closeModalEmitter.emit();
+    if (event.target === this.modalElement.nativeElement || 
+      event.target === this.closeButton.nativeElement)
+      this.closeModalEmitter.emit();
   }
   unexpectedEventsHandler(event:Event)
   {

@@ -1,8 +1,8 @@
 <img src="logo.png" alt="chess logo"/>
-<button (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
-<button (click) = 'handleSocial()'>Social<img src="people.png" alt="icon of people in blue"/></button>
-<div class="navbar-item" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
-<div class="navbar-item" (click)="isLoginModalOpen = !isLoginModalOpen;">Log In</div> 
+<button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
+<button class="fancy-text" (click) = 'handleSocial()'>Social<img src="people.png" alt="icon of people in blue"/></button>
+<div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
+<div class="navbar-item fancy-text" (click)="isLoginModalOpen = !isLoginModalOpen;">Log In</div> 
 <input type="text" placeholder="search.." [(ngModel)]="searchQuery"/>
 <div class="navbar-item">{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
 @if (isSignupModalOpen)
