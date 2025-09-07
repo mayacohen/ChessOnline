@@ -24,14 +24,15 @@ export class Main implements OnInit{
       {
         sessionStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken); 
+        this.ws.connect(response.accessToken);
       },
       error: err => console.log(err)
     });
     this.isUserLoggedIn = this.client.getLoggedInStatus(); 
-    this.ws.getMessages().subscribe({
-      next: m => console.log(m),
-      error: err => console.log(err)   
-    });
+     this.ws.getMessages().subscribe({
+       next: m => console.log(m),
+       error: err => console.log(err)   
+     });
   }
   handleGameRequestModal()
   {

@@ -5,7 +5,7 @@ import { Client } from '../../services/client';
 import { FormsModule } from '@angular/forms';
 import { LoggedInUserModel } from '../../models/logged-in-user-model';
 import { ClientMessageModel } from '../../models/client-message-model';
-
+import { WebsocketService } from '../../services/websocket-service';
 @Component({
   selector: 'app-chat',
   imports: [CommonModule, FormsModule],
@@ -21,7 +21,8 @@ export class Chat implements OnInit{
   userName:string = '';
   newMessageContent = '';
   @Output() closeChatModal = new EventEmitter<void>();
-  constructor(private client:Client, private cdr: ChangeDetectorRef){}
+  constructor(private client:Client, private cdr: ChangeDetectorRef, 
+    private websocketService: WebsocketService){}
   ngOnInit(): void {
     this.userName = this.client.getUserName();
     this.client.getConversationWithParter(this.userChat.username).subscribe({
@@ -30,6 +31,11 @@ export class Chat implements OnInit{
         this.cdr.detectChanges();
       },
       error: err => console.log(err) 
+    });
+    this.websocketService.sendMessage("fffff");
+    this.websocketService.getMessages().subscribe({ //also on main
+      next: m => console.log(m),
+      error: err => console.log(err)
     });
     //do something with websockets probably
   }

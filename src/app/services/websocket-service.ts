@@ -6,23 +6,45 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class WebsocketService {
-  private socket$: WebSocketSubject<any>;
+  private socket$: WebSocketSubject<any> | null = null;;
   // private socket!: WebSocket;
-  constructor() {
-    this.socket$ = webSocket('wss://localhost:7070/ws');
+  
+  constructor() {}
+
+  // Explicitly connect with token
+  connect(token: string): void {
+    if (!this.socket$ || this.socket$.closed) {
+      this.socket$ = webSocket({
+        url: `wss://localhost:7070/ws?access_token=${token}`,
+        deserializer: msg => JSON.parse(msg.data), // server sends JSON
+        serializer: msg => JSON.stringify(msg),   // client sends JSON
+      });
+    }
   }
-  // Send a message to the server
-  sendMessage(message: any) {
-    this.socket$.next(message);
+
+  // Send a message
+  sendMessage(message: any): void {
+    if (this.socket$) {
+      this.socket$.next(message);
+    } else {
+      console.error('WebSocket not connected.');
+    }
   }
-  // Receive messages from the server
+
+  // Receive messages
   getMessages(): Observable<any> {
+    if (!this.socket$) {
+      throw new Error('WebSocket not connected. Call connect(token) first.');
+    }
     return this.socket$.asObservable();
   }
-  // Close the WebSocket connection
-  closeConnection() {
-    this.socket$.complete();
+
+  // Close the connection
+  closeConnection(): void {
+    this.socket$?.complete();
+    this.socket$ = null;
   }
+}
   // connect() {
   //   if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
   //     this.sthis.socket$ocket = new WebSocket('ws://localhost:3000');
@@ -34,4 +56,3 @@ export class WebsocketService {
   //     this.socket.close();
   //   }
   // }
-}
