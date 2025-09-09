@@ -18,7 +18,11 @@ export class WebsocketService {
         url: `wss://localhost:7070/ws?access_token=${token}`,
         deserializer: msg => JSON.parse(msg.data), // server sends JSON
         serializer: msg => JSON.stringify(msg),   // client sends JSON
-      });
+         openObserver: {
+          next: () => {
+              console.log('connetion ok');
+          }
+      }});
     }
   }
 

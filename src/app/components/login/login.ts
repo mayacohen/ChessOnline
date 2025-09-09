@@ -1,4 +1,5 @@
-import { Component, Output, EventEmitter, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ViewChild, 
+  ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormGroup,FormBuilder,ReactiveFormsModule,Validators } from '@angular/forms';
 import { Client } from '../../services/client';
 import { LoginModel } from '../../models/login-model';
@@ -11,9 +12,11 @@ import { LoginModel } from '../../models/login-model';
 export class Login implements OnInit{
   @ViewChild("modal") modalElement!: ElementRef;
   @ViewChild("closeButton") closeButton!: ElementRef;
+  isGeneralError = false;
   loginForm!: FormGroup;
   @Output() closeModalEmitter = new EventEmitter<void>(); 
-  constructor(private client:Client, private fb:FormBuilder){}
+  constructor(private client:Client, private fb:FormBuilder,
+    private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
      this.loginForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -42,7 +45,11 @@ export class Login implements OnInit{
           sessionStorage.setItem("accessToken", token);
           this.closeModalEmitter.emit();
         },
-        error: err => console.log(err)
+        error: err => 
+          {
+            this.isGeneralError = true;
+            this.cdr.detectChanges();
+          }
       });
     }
   }

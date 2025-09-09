@@ -1,9 +1,9 @@
 <div class="modal">
     <div class="rq-content">
-        <div class="centered">Do you want to challenge {{requestUser.username}} to a game of chess?</div>
+        <div class="centered">{{displayedText}}</div>
         <div class="organize-buttons">
-            <button class="fancy-text">Confirm</button>
-            <button class="fancy-text">Cancel</button>
+            <button class="fancy-text" (click)='onConfirm()'>{{acceptOrConfirm}}</button>
+            <button class="fancy-text" (click)='onCancel()'>{{cancelOrReject}}</button>
         </div>
     </div>
 </div>

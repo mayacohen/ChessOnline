@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Signup } from '../signup/signup';
 import { CommonModule } from '@angular/common';
 import { Login } from '../login/login';
@@ -15,7 +15,7 @@ import { Client } from '../../services/client';
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
-export class Navbar{
+export class Navbar implements OnInit{
   isSearchModalOpen = false;
   isSignupModalOpen = false;
   isLoginModalOpen = false;
@@ -32,6 +32,23 @@ export class Navbar{
   searchQuery=''; //search for users
   userList : (string | null)[] = [];
   constructor(private client:Client, private cdr: ChangeDetectorRef){}
+  ngOnInit(): void {
+    this.client.isGameRequestPopUp.subscribe({
+      next: val => 
+        {
+          if (val)
+          {
+            this.isSearchModalOpen = false;
+            this.isSignupModalOpen = false;
+            this.isLoginModalOpen = false;
+            this.isRequestGameModalOpen = false;
+            this.isSocialModalOpen = false;
+            this.cdr.detectChanges();
+          }
+        },
+        error: err => console.log("hahaha"+err)
+    });
+  }
   closeSignupModal()
   {
     this.isSignupModalOpen = false;
@@ -84,13 +101,14 @@ export class Navbar{
             if (userlist != null)
             {
               this.userList = userlist;
-              this.isSearchModalOpen = true;
-              this.cdr.detectChanges();
-              userlist.forEach(
-                u => console.log(u)
-              );
             }
-          },
+            else
+            {
+              this.userList = [];
+            }
+            this.isSearchModalOpen = true;
+            this.cdr.detectChanges();
+            },
           error: err => console.log(err) 
       });
     }

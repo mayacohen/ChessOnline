@@ -17,4 +17,10 @@
         <app-request-game-modal (resultEmitter)="handleGameRequestModal()">
         </app-request-game-modal>
     }
+    @if(!isRequestModalOpen && isRequestConfirmation)
+    {
+        <app-request-confirmation [requestUser]="userGame" 
+            (emitIsConfirm)="handleRequestConfirmation($event)">
+        </app-request-confirmation>
+    }
 }

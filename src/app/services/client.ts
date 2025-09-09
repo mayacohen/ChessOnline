@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { ReturnTokensModel } from '../models/return-tokens-model';
 import { SignUpModel } from '../models/sign-up-model';
 import { LoginModel } from '../models/login-model';
@@ -14,6 +14,8 @@ export class Client {
   private http = inject(HttpClient);
   private userName:string = 'guest';
   private isLogged = false;
+  public isGameRequestPopUp : BehaviorSubject<boolean> 
+  = new BehaviorSubject<boolean>(false);
   getUserName()
   {
     return this.userName;
@@ -60,6 +62,14 @@ export class Client {
   public getConversationWithParter(partner:string):Observable<ClientConversationModel>
   {
     return  this.http.get<ClientConversationModel>(this.serverUrl+"Chat/"+partner);
+  }
+  public getAvailablePlayers():Observable<string[]>
+  {
+    return this.http.get<string[]>(this.serverUrl+"Players");
+  }
+  public sendGameRequest(userName :string):Observable<boolean>
+  {
+    return this.http.post<boolean>(this.serverUrl+"GameRequest/"+userName,null);
   }
   // get and send user details,
   // chess communication in chess logic?

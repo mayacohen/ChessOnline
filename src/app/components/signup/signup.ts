@@ -1,8 +1,12 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef,
+  ChangeDetectorRef
+ } from '@angular/core';
 import { FormGroup,FormsModule, FormBuilder,Validators,
    ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Client } from '../../services/client';
 import { SignUpModel } from '../../models/sign-up-model';
+import { IdentityError } from '../../models/identity-error';
+import { IdentityResult } from '../../models/identity-result';
 
 @Component({
   selector: 'app-signup',
@@ -14,11 +18,16 @@ export class Signup implements OnInit{
   @ViewChild("modal") modalElement!: ElementRef;
   @ViewChild("closeButton") closeButton!: ElementRef;
   signupForm!: FormGroup;
+  isEmailTaken = false;
+  isUserNameTaken = false;
+  isGeneralError = false;
   @Output() closeModalEmitter = new EventEmitter<void>(); 
-  constructor(private client:Client, private fb:FormBuilder){}
+  constructor(private client:Client, private fb:FormBuilder, 
+    private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
      this.signupForm = this.fb.group({
-      userName: ['', [Validators.required, Validators.minLength(3)]],
+      userName: ['', [Validators.required, Validators.minLength(3),
+          this.usernameDoesntStartWithGuestValidator]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, this.passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]]
@@ -34,7 +43,13 @@ export class Signup implements OnInit{
     }
     return null;
   }
-
+  usernameDoesntStartWithGuestValidator(control:AbstractControl)
+  {
+    const username = control.value;
+    if (username && username instanceof String && username.startsWith("guest-"))
+      return {illegalUsername: true};
+    return null;
+  }
   confirmPasswordValidator(control: AbstractControl) 
   {
     const password = control.value.password;
@@ -67,10 +82,26 @@ export class Signup implements OnInit{
         signedupDate: formatted
       }
       this.client.register(signupSubmission).subscribe({
-        next: () => console.log('works'),
-        error: err => console.log(err)
+        next: () => {this.closeModalEmitter.emit();},
+        error: err => {
+          if (err)
+          {
+            this.isEmailTaken = false;
+            this.isUserNameTaken = false;
+            this.isGeneralError = false;
+            const messages = this.getIdentityErrors(err.error);
+            messages.forEach(error => {
+              if (error.includes("Name") && error.includes("already taken"))
+                this.isUserNameTaken = true;
+              if (error.includes("Email") && error.includes("already taken")) 
+                this.isEmailTaken = true;
+            });
+            if (!this.isEmailTaken && !this.isUserNameTaken)
+              this.isGeneralError = true;
+            this.cdr.detectChanges();
+          }
+        }
       });
-      this.closeModalEmitter.emit();
     }
   }
   closeModal(event : Event)
@@ -78,5 +109,14 @@ export class Signup implements OnInit{
     if (event.target === this.modalElement.nativeElement || 
       event.target === this.closeButton.nativeElement)
       this.closeModalEmitter.emit();
+  }
+  isIdentityResult(error: any): error is IdentityResult {
+  return error && typeof error.succeeded === "boolean" && Array.isArray(error.errors);
+}
+ getIdentityErrors(error: any): string[] {
+  if (this.isIdentityResult(error)) {
+    return error.errors.map(e => e.description);
+  }
+  return [];
   }
 }

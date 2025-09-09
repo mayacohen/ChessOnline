@@ -3,6 +3,33 @@
     <button class="close-btn" #closeButton (click)="closeModal($event)">&times;</button>
     <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
+        @if (isEmailTaken && isUserNameTaken)
+        {
+          <small class="text-danger">
+                  The email and user name you entered are already in use.    
+          </small>
+        }
+        @else 
+        {
+          @if (isEmailTaken)
+          {
+            <small class="text-danger">
+                    The email you entered is already in use.    
+            </small>
+          }
+          @if (isUserNameTaken)
+          {
+            <small class="text-danger">
+                    The user name you entered is already in use.   
+            </small>
+          }
+          @if (isGeneralError)
+          {
+             <small class="text-danger">
+                    Something went wrong. Please try again.    
+            </small>
+          }
+        }
         <label for="userName">User Name: </label>
         <input
           id="userName"
@@ -25,6 +52,12 @@
           {
               <small class="text-danger">
                   Username must be at least 3 characters.
+              </small>
+          }
+          @if(signupForm.get('userName')?.errors?.['illegalUsername'])
+          {
+            <small class="text-danger">
+                  Username must not start with 'guest-'
               </small>
           }
         }
@@ -89,6 +122,7 @@
           formControlName="confirmPassword"
           type="password"
           class="form-control"
+          (keydown.enter)="if (signupForm.valid) onSubmit();"
         />
         @if((signupForm.get('confirmPassword')?.invalid ||
         signupForm.errors?.['passwordMismatch']) &&

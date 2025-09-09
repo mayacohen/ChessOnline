@@ -18,7 +18,7 @@
             }
         </div>
         <div class="send-new-message-container">
-            <input type="text" placeholder="Message" [(ngModel)]="newMessageContent"/>
+            <input type="text" placeholder="Message" [(ngModel)]="newMessageContent" (keydown.enter)="sendMessage()"/>
             <button class="sendButton" (click)="sendMessage()">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
