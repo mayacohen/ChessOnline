@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { ActiveUserModel } from '../../models/active-user-model';
 
 @Component({
   selector: 'app-request-confirmation',

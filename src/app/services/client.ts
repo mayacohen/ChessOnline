@@ -7,6 +7,7 @@ import { LoginModel } from '../models/login-model';
 import { ReturnLoggedUsersModel } from '../models/return-logged-users-model';
 import { ClientMessageModel } from '../models/client-message-model';
 import { ClientConversationModel } from '../models/client-conversation-model';
+import { ClientServerMessage } from '../models/client-server-message';
 @Injectable({
   providedIn: 'root'
 })
@@ -70,6 +71,10 @@ export class Client {
   public sendGameRequest(userName :string):Observable<boolean>
   {
     return this.http.post<boolean>(this.serverUrl+"GameRequest/"+userName,null);
+  }
+  public handleGameRequestResponse(m: ClientServerMessage) : Observable<boolean>
+  {
+    return this.http.put<boolean>(this.serverUrl+"GameResponse",m);
   }
   // get and send user details,
   // chess communication in chess logic?

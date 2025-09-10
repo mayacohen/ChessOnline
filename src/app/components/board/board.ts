@@ -14,11 +14,9 @@ import { ActiveUserModel } from '../../models/active-user-model';
 })
 export class Board implements OnInit, AfterViewInit{
   board: string[][] = [];
-  @Input() opponent: ActiveUserModel = {username: 'Guest', userImg: 'example.png', score: null, id: ''}; 
-  player: ActiveUserModel = {username: 'Guest', userImg: 'example.png', score: null, id: ''};
   constructor(private client:Client, private gamelogic:Gamelogic){}
   ngOnInit(): void {
-    this.player.username = this.client.getUserName();
+    //this.player.username = this.client.getUserName();
     for (let i = 0; i< 8; i++)
     {
       if (!this.board[i])
