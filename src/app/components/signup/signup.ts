@@ -7,10 +7,12 @@ import { Client } from '../../services/client';
 import { SignUpModel } from '../../models/sign-up-model';
 import { IdentityError } from '../../models/identity-error';
 import { IdentityResult } from '../../models/identity-result';
+import { GoogleSignup } from '../google-signup/google-signup';
+import { FacebookSignup } from '../facebook-signup/facebook-signup';
 
 @Component({
   selector: 'app-signup',
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule, GoogleSignup, FacebookSignup],
   templateUrl: './signup.html',
   styleUrl: './signup.scss'
 })

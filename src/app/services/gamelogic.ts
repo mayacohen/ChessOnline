@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-class Position
+export class Position
 {
   private row!: number;
   private col!: number;
@@ -32,7 +32,7 @@ class Position
     this.col+=change;
   }
 }
-class MovePosition
+export class MovePosition
 {
   private oldPos!: Position;
   private newPos!: Position;

@@ -72,9 +72,17 @@ export class Client {
   {
     return this.http.post<boolean>(this.serverUrl+"GameRequest/"+userName,null);
   }
-  public handleGameRequestResponse(m: ClientServerMessage) : Observable<boolean>
+  public handleGameRequestResponse(m: ClientServerMessage) : Observable<void>
   {
-    return this.http.put<boolean>(this.serverUrl+"GameResponse",m);
+    return this.http.put<void>(this.serverUrl+"GameResponse",m);
+  }
+  public setMove(m: ClientServerMessage) : Observable<void>
+  {
+    return this.http.put<void>(this.serverUrl+"GameMove",m);
+  }
+  public setPromotion(m: ClientServerMessage) : Observable<void>
+  {
+    return this.http.put<void>(this.serverUrl+"Promotion",m);
   }
   // get and send user details,
   // chess communication in chess logic?
