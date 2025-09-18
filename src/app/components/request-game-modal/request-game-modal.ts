@@ -1,5 +1,4 @@
 import { Component, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActiveUserModel } from '../../models/active-user-model';
 import { CommonModule } from '@angular/common';
 import { PlayerDetailsForGame } from '../player-details-for-game/player-details-for-game';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +20,6 @@ export class RequestGameModal implements OnInit{
   emptyMessage = "Loading Users..";
   constructor (private client:Client, private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
-    console.log("febea");
     this.client.getAvailablePlayers().subscribe({
       next: list => 
         {
@@ -58,6 +56,7 @@ export class RequestGameModal implements OnInit{
             //open modal - message sent, waiting. 2:30 min is eanough?
             //reject etc handle.  
           },
+          //write that a request couldn't be sent or whatever
         error: err => console.log('issue - don\'t fix'),
       })
       //send http request to gameUser

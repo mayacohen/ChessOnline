@@ -32,7 +32,7 @@ export class Position
     this.col+=change;
   }
 }
-export class MovePosition
+class MovePosition
 {
   private oldPos!: Position;
   private newPos!: Position;
@@ -133,7 +133,7 @@ abstract class ChessPiece
   game: ChessGame, 
   isOneStep: boolean
   ): MovePosition[]
-  {
+  { ///bug!!!! cont. here
     let moveResults: MovePosition[] = [];
     currentPos.moveRow(rowDelta);
     currentPos.moveCol(colDelta);
@@ -362,7 +362,7 @@ class Pawn extends ChessPiece
   {
     if (!(startPosition instanceof Position))
       return [];
-    const moveDirection = super.getWhite() ? 1 : -1; // white = 0, black = 7
+    const moveDirection = super.getWhite() ? -1 : 1; // white = 7, black = 0
     let moveResult : MovePosition[] = [];
     let checkPos = new Position(startPosition.getRow(), startPosition.getCol());
     checkPos.moveRow(moveDirection);
@@ -499,6 +499,11 @@ class ChessGame
   private checkBoard!: (ChessPiece | null)[][];
   private isWhiteTurn: boolean = true;
   private isWhitePlayer!: boolean;
+  private isPromotion = false;
+  public getIsWaitingForPromotion()
+  {
+    return this.isPromotion;
+  }
   getPieceFromBoard(pos: Position, isCheckBoard:boolean): (ChessPiece | null)
   {
     if (pos.getRow() >= 0 && pos.getRow() < 8 && pos.getCol() >= 0 && pos.getCol() < 8)
@@ -524,6 +529,8 @@ class ChessGame
     {
       if (!this.board[i])
         this.board[i] = [];
+      if (!this.checkBoard[i])
+        this.checkBoard[i]=[];
       const isWhite = i<3? false : true; 
       for( let j = 0; j< 8; j++)
       {
@@ -548,6 +555,7 @@ class ChessGame
           console.log('bug');
         }
         this.board[i].push(elem);
+        this.checkBoard[i].push(null);
       }
     }
   }
@@ -564,7 +572,7 @@ class ChessGame
   private setMove(movePosition: MovePosition)
   {
     const piece = this.getPieceFromBoard(movePosition.getOldPos(), false);
-    if (piece === null)
+    if (piece === null || this.isPromotion)
     {
       console.log('bug');
       return;
@@ -575,6 +583,10 @@ class ChessGame
     )
     if (isLegalMove !== undefined)
     {
+      if (piece instanceof Pawn && ((piece.getWhite() && 
+      movePosition.getNewRow() === 0) || (!piece.getWhite() && 
+      movePosition.getNewRow() === 7)))
+        this.isPromotion = true;
       if (piece instanceof Pawn && movePosition.getColAbs() === 1 && 
       movePosition.getRowAbs() === 1 && 
       this.getPieceFromBoard(movePosition.getNewPos(), false) === null)
@@ -718,20 +730,64 @@ class ChessGame
     movesToCheck.push(...piece.returnLegalMoves(false, this, startPosition));
     return movesToCheck.filter(m => !this.isMoveLeadToCheck(m));
   }
+  setPromotion(pos:Position, promotionChar:string) //no checking
+  //if there's bug here then ehhh
+  {
+    let piece: ChessPiece | null = null;
+    const pawn = this.getPieceFromBoard(pos,false);
+    if (pawn instanceof Pawn)
+    {
+      switch (promotionChar[0])
+      {
+        case 'q':
+          piece = new Queen(pawn.getWhite());
+          break;
+        case 'b':
+          piece = new Bishop(pawn.getWhite());
+          break;
+        case 'n':
+          piece = new Knight(pawn.getWhite());
+          break;
+        case 'r':
+          let rook = new Rook(pawn.getWhite());
+          rook.setMoved();
+          piece = rook;
+          break;
+      }
+      this.board[pos.getRow()][pos.getCol()] = piece;
+      this.isPromotion = false;
+    }
+  }
   //checkValidityCastling(startPosition: Position, )
 
 }
 export class Utility
 {
+  static stringToMovePos(movement:string)
+  {
+    // if (movement.length !== 4)
+    //   return null;
+    const oldPos = this.standardToNum(movement.substring(0,2));
+    const newPos = this.standardToNum(movement.substring(2,2));
+    return new MovePosition(oldPos, newPos);
+  }
   static numToStandard(pos:Position): string
   {
-    return String.fromCharCode(pos.getCol()+parseInt('A'))
+    return String.fromCharCode(pos.getCol()+'A'.charCodeAt(0))
     +String.fromCharCode(8-pos.getRow());
   }
   static standardToNum(code:string):Position
   {
-    const col = parseInt(code[0])-parseInt('A');
+    const col = code.charCodeAt(0) - 'A'.charCodeAt(0);
     return new Position(8-parseInt(code[1]),col);
+  }
+  standardToInt(code:string):number[]
+  {
+    const col = code.charCodeAt(0) - 'A'.charCodeAt(0);
+    const arr: number[] =[];
+    arr.push(8-parseInt(code[1]));
+    arr.push(col);
+    return arr;
   }
   static movePositionsToString(moves: MovePosition[]): string[]
   {
@@ -776,7 +832,7 @@ export class Gamelogic {
       //send server move
   }
 
-  //white row 0,1. black rows 6,7.
+  //white row 6,7. black rows 0,1.
   //col 3-q,4-k 
   //promotion, win, lose, draw - special message
     //if castling move two, if enpassant kill the other pawn.

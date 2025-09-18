@@ -1,0 +1,26 @@
+.container
+{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 15px;
+    justify-content: space-between;
+    div
+    {
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 7px;
+    }
+    div:hover
+    {
+        cursor: pointer;
+        background-color: rgb(203, 221, 254);
+    }
+}
+.blackPiece
+{
+    color: blueviolet;
+}
+.whitePiece
+{
+    color: rgb(214, 184, 242);
+}

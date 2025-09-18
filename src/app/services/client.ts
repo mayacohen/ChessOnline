@@ -8,6 +8,7 @@ import { ReturnLoggedUsersModel } from '../models/return-logged-users-model';
 import { ClientMessageModel } from '../models/client-message-model';
 import { ClientConversationModel } from '../models/client-conversation-model';
 import { ClientServerMessage } from '../models/client-server-message';
+import { LoggedDTO } from '../models/logged-dto';
 @Injectable({
   providedIn: 'root'
 })
@@ -15,8 +16,26 @@ export class Client {
   private http = inject(HttpClient);
   private userName:string = 'guest';
   private isLogged = false;
+  private userPic = "example.png";
+  public getUserPic()
+  {
+    return this.userPic;
+  }
+  public setUserPic(userPic:string)
+  {
+    this.userPic = userPic;
+  }
   public isGameRequestPopUp : BehaviorSubject<boolean> 
   = new BehaviorSubject<boolean>(false);
+  private defaultCSM : ClientServerMessage ={
+     content: null,
+    senderUserName : null,
+    receiverUserName : null,
+    date : null,
+    type : "default"
+  };   
+  public newServerGameData : BehaviorSubject<ClientServerMessage>
+  = new BehaviorSubject<ClientServerMessage>(this.defaultCSM);
   getUserName()
   {
     return this.userName;
@@ -43,9 +62,9 @@ export class Client {
   {
     return this.http.post<void>(this.serverUrl+"Register", signUp)
   }
-  public login(login: LoginModel): Observable<string>
+  public login(login: LoginModel): Observable<LoggedDTO>
   {
-    return this.http.post<string>(this.serverUrl+"Login", login, 
+    return this.http.post<LoggedDTO>(this.serverUrl+"Login", login, 
       { responseType: 'text' as 'json'});
   }
   public search(query:string): Observable<(string | null)[] | null>

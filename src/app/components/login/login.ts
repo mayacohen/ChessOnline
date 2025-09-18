@@ -39,10 +39,11 @@ export class Login implements OnInit{
         password: this.loginForm.value.password,
       }
       this.client.login(loginSubmission).subscribe({
-        next: token => {
+        next: loggedDTO => {
           this.client.setLoggedInStatus(true),
           this.client.setUserName(loginSubmission.userName);
-          sessionStorage.setItem("accessToken", token);
+          this.client.setUserPic(loggedDTO.userPic);
+          sessionStorage.setItem("accessToken", loggedDTO.token);
           this.closeModalEmitter.emit();
         },
         error: err => 

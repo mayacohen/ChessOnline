@@ -10,16 +10,16 @@ export class RequestConfirmation implements OnInit{
   @Input() requestUser: string =''; 
   @Output() emitIsConfirm = new EventEmitter<boolean>();
   @Input() isChallenging : boolean = true; 
-  acceptOrConfirm = "Confirm";
-  cancelOrReject = "Cancel";
+  acceptOrConfirm = "Accept";
+  cancelOrReject = "Reject";
   displayedText = "";
   ngOnInit(): void {
     if (this.isChallenging)
     {
       this.displayedText = "Do you want to challenge "+ this.requestUser
       +" to a game of chess?";
-      this.acceptOrConfirm = "Accept";
-      this.cancelOrReject = "Reject";
+      this.acceptOrConfirm = "Confirm";
+      this.cancelOrReject = "Cancel";
     }
     else
       this.displayedText = "You were challenged by " + this.requestUser

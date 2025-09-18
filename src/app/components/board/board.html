@@ -10,15 +10,30 @@
                 @for (sq of row; track sq; let j = $index)
                 {
                     <div [id]='board[i][j]'  
-                    [ngClass]="getTileClass(i,j)" (click)="onSquareClick(id)">
+                    (click)="onSquareClick(board[i][j])">
                     </div>
                 }
             }
-            if (isWhitePlayer !== isWhiteTurn)
+            @if (isWhitePlayer !== isWhiteTurn)
             {
                 <div id="hourglassModal">
-                    <img src="hourglass-svg" class="spin" alt='https://dryicons.com/free-icons/hourglass'>
+                    <div>
+                        <img src="hourglass-svg.svg" class="spin" alt='https://dryicons.com/free-icons/hourglass'>
+                    </div>
                 </div>
+            }
+            @if (isGameOverAndMessage)
+            {
+                <app-game-over
+                [gameOverType]="gameOverType"
+                [opponentUserName]="opponentUserName"
+                (closeModalOutput)="closeGameOverMessage()"
+                ></app-game-over>
+            }
+            @if (isPromotionWindowOpen)
+            {
+                <app-promotion [isWhitePlayer]="isWhitePlayer"
+                (promotion)="getChosenPromotion($event)"></app-promotion>
             }
         </div>
         <!-- <app-player-details-for-game 

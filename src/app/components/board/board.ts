@@ -1,49 +1,132 @@
-import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input,
+  ChangeDetectorRef
+ } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameTracker } from '../game-tracker/game-tracker';
-import { Gamelogic, Utility, Position,MovePosition } from '../../services/gamelogic';
+import { Gamelogic, Utility, Position } from '../../services/gamelogic';
 import { Client } from '../../services/client';
 import { PlayerDetailsForGame } from '../player-details-for-game/player-details-for-game';
 import { ClientServerMessage } from '../../models/client-server-message';
+import { GameOver } from '../game-over/game-over';
+import { Promotion } from '../promotion/promotion';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, GameTracker, PlayerDetailsForGame],
+  imports: [CommonModule, GameTracker, PlayerDetailsForGame, GameOver, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class Board implements OnInit, AfterViewInit{
   @Input() opponentUserName = ''; 
+  isGameOver = false;
+  isGameOverAndMessage = false;
+  isPromotionWindowOpen = false;
+  gameOverType = '';
+  lastOppositionMove = '';
   board: string[][] = [];
-  isBoardPieceHighLighted : boolean[][] = [];
-  currentlyClicked: number[] = [-1,-1];
+  currentlyClicked: string = "";
   @Input() isWhitePlayer : boolean = true;
   isWhiteTurn = true; 
   currentPickedSquare: string | null = null;
   constructor(private client:Client, private gamelogic:Gamelogic,
-    private position:Position, private movePosition:MovePosition){}
+    private cdr: ChangeDetectorRef){}
   listOfElemIds: string[] = [];
   ngOnInit(): void {
     //this.player.username = this.client.getUserName();
+    //userName, userpic, score
     for (let i = 0; i< 8; i++)
     {
       if (!this.board[i])
         this.board[i] = [];
-      if (!this.isBoardPieceHighLighted[i])
-        this.isBoardPieceHighLighted[i] = [];
       for (let j = 0; j<8; j++)
-      {
-        this.board[i].push((8-i).toString()+ String.fromCharCode(('A'.charCodeAt(0)+j)));
-        this.isBoardPieceHighLighted[i].push(false);
-      }
-        
+        this.board[i].push(String.fromCharCode(('A'.charCodeAt(0)+j))+(8-i).toString());
     }
+    this.client.newServerGameData.subscribe({next:
+      csm =>
+      {
+        if (csm.type !== "default")
+          this.isWhiteTurn = !this.isWhiteTurn;
+        if (csm.content !== null && csm.content.length >= 4)
+        {
+          this.lastOppositionMove = csm.content;
+          this.clearHighLightBoard();
+          this.setMoveHighLighted(this.lastOppositionMove);
+          if (this.gamelogic.game === undefined)
+            console.log('bug');
+          this.gamelogic.game.setMoveOpposition(Utility.stringToMovePos(csm.content.substring(0,4)));
+          if (csm.content.length == 5)
+            this.gamelogic.game.setPromotion(Utility.standardToNum(csm.content.substring(0,2))
+          ,csm.content[4]);
+          this.doMoveHTML(csm.content);
+        }
+        if (csm.type !== "default" && csm.type !=="Move")
+        {
+          this.isGameOver = true;
+          this.gameOverType = csm.type;
+          this.isGameOverAndMessage = true;
+        }
+        this.cdr.detectChanges();
+      },
+      error: err => console.log(err) 
+  });
+  }
+  doMoveHTML(ids:string)
+  {
+    const elem1 = document.getElementById(ids.substring(0,2));
+    const elem2 = document.getElementById(ids.substring(2,2));
+    if (elem1 != null && elem2 != null)
+    {
+      const colDiff = Math.abs(ids.charCodeAt(0)-ids.charCodeAt(2));
+      const diff = colDiff+Math.abs(ids.charCodeAt(1)-ids.charCodeAt(3));
+      if (elem1.className.includes('pawn') && diff === 2)
+      {
+        const pawnRemove = document.getElementById(ids[0]+ids[3]);
+        if (pawnRemove === null || pawnRemove.children.length < 1)
+        {
+          console.log('bug');
+          return;
+        }
+        pawnRemove.removeChild(pawnRemove.children[0]);
+      }
+      if (elem1.className.includes('king') && colDiff===2)
+      {
+        let rookStartCol = 'A', rookEndCol='D';
+        if (ids.charCodeAt(2) > ids.charCodeAt(0))
+        {
+          rookStartCol = 'H';
+          rookEndCol = 'F';
+        }
+        this.moveElement(rookStartCol+ids[1],rookEndCol+ids[1]);
+      }
+      this.moveElement(ids.substring(0,2), ids.substring(2,2));
+    }
+  }
+  moveElement(idStart:string, idEnd:string)
+  {
+    const startSq = document.getElementById(idStart);
+    const endSq = document.getElementById(idEnd);
+    if (endSq === null ||endSq.children.length > 0
+      ||startSq === null ||startSq.children.length < 1
+    ) 
+    {
+      console.log('bug');
+      return;
+    }
+   endSq.appendChild(startSq.children[0]);
   }
   ngAfterViewInit(): void {
     for (let i = 0; i< 8; i++)
     {
-      if (i==2)
-        i=6;
+      if (i>= 2 && i<6)
+      {
+        for( let j = 0; j< 8; j++)
+          {
+            const tile = document.getElementById(this.board[i][j]);
+            if (tile === null) return;
+            tile.className= this.getTileClass(i,j,false);
+          }
+        continue;   
+      }
       for( let j = 0; j< 8; j++)
       {
         let elemId = '';
@@ -79,16 +162,19 @@ export class Board implements OnInit, AfterViewInit{
           elemId+='K';
         }
         const parent = document.getElementById(this.board[i][j]);
+        if (parent === null)
+          return;
         if (i<3)
         {
           chessPiece.classList.add('blackPiece');
-          elemId+='w';
+          elemId+='b';
         }
         else
         {
           chessPiece.classList.add('whitePiece');
-          elemId+='b';
+          elemId+='w';
         }
+        parent.className= this.getTileClass(i,j,false);
         parent?.appendChild(chessPiece);
         chessPiece.id = elemId + parent?.id;
         this.listOfElemIds.push(chessPiece.id); 
@@ -99,42 +185,98 @@ export class Board implements OnInit, AfterViewInit{
   //click on circled place() (or on circle)
   //future - drag and drop.
   //if (not your turn) - add hourglass
+  clearHighLightBoard()
+  {
+    for (let i = 0; i< 8; i++)
+    {
+      for (let j=0; j< 8; j++)
+      {
+         //this.isBoardPieceHighLighted[i][j]=false;
+         const elem = document.getElementById(this.board[i][j]);
+         if (elem != null)
+          elem.className = this.getTileClass(i,j,false);
+      }
+    }
+  }
+  closeGameOverMessage()
+  {
+    this.isGameOverAndMessage = false;
+    //also freeze the game
+  }
+  getChosenPromotion(promotion: string)
+  {
+    this.client.setPromotion(this.returnCSM("Promotion", promotion[0])).subscribe({
+      next: () => {
+        this.isWhiteTurn = ! this.isWhiteTurn;}
+        //turn over process
+      , error: err => console.log(err)
+    });
+  }
   onSquareClick(id:string)
   {
-    const Square = document.getElementById(id);
-    if (Square === null)
+    const square = document.getElementById(id);
+    if (square === null || this.isGameOver)
       return;
-    if (Square.childElementCount !== 0)
-    {
-      
-      if (Square.children[0].className.includes("fa-chess"))
-        this.onChessPieceClick(Square.children[0].id);
+    if (square.childElementCount !== 0 && (square.children[0].id.includes('w') === this.isWhiteTurn && this.isWhitePlayer
+    ===  this.isWhiteTurn))
+    { 
+      if (square.children[0].className.includes("fa-circle")
+      || square.children.length === 2)
+        this.doMove(square);
+      else if (square.children[0].className.includes("fa-chess"))
+        this.onChessPieceClick(square.children[0].id);
     }
-
   }
-  onChessPieceMovment(Square:HTMLElement) //not completed
+  returnCSM(type:string, content: string): ClientServerMessage
   {
-    if (Square.children[0].className.includes("fa-circle"))
+     return {
+      receiverUserName : this.opponentUserName,
+      content: content,
+      senderUserName : this.client.getUserName(),
+      date : null,
+      type : type,
+    };
+  }
+  doMove(square:HTMLElement)
+  {
+    if (this.currentPickedSquare === null)
     {
-      if (this.currentPickedSquare === null)
-      {
-        console.log("error");
-        return;
-      }
-      const id = Square.id;
-      const message: ClientServerMessage ={
-        receiverUserName : this.opponentUserName,
-        content: this.currentPickedSquare+id,
-        senderUserName : null,
-        date : null,
-        type : "Move",
-      };
-      this.client.setMove(message).subscribe({next: ()=> this.gamelogic.setMove(this.currentPickedSquare+id),
-        error: err => console.log(err)
-      });
+      console.log("error");
+      return;
+    }
+    const id = square.id;
+    const message = this.returnCSM("Move", this.currentPickedSquare+id);
+    this.client.setMove(message).subscribe({next: ()=> {
+      this.gamelogic.setMove(this.currentPickedSquare+id);
+      this.removeFormerCircles();
+      this.setSquareHiglighted(square);
+      if (square.children.length > 0)
+        square.removeChild(square.children[0]);
+      if (this.gamelogic.game.getIsWaitingForPromotion())
+        this.isPromotionWindowOpen = true;
+      else
+        this.isWhiteTurn = ! this.isWhiteTurn;
+      this.doMoveHTML(this.currentPickedSquare+id); 
+    },
+      error: err => console.log(err)
+    });
+  }
+  setMoveHighLighted(ids:string)
+  {
+    const elem1 = document.getElementById(ids.substring(0,2));
+    const elem2 = document.getElementById(ids.substring(2,2));
+    if (elem1 != null && elem2 != null)
+    {
+      this.setSquareHiglighted(elem1);
+      this.setSquareHiglighted(elem2);
     }
   }
-  onChessPieceClick(id:string)
+  setSquareHiglighted(square: HTMLElement)
+  {
+      const pos:Position = Utility.standardToNum(square.id);
+      square.className = this.getTileClass(pos.getRow(), pos.getCol(), true);
+  } 
+  onChessPieceClick(id:string)//not correct
   {
     const piece = document.getElementById(id);
     const pos = piece?.parentElement?.id;
@@ -164,20 +306,30 @@ export class Board implements OnInit, AfterViewInit{
     for (let i = 0; i < prevCircles.length; i++)
       prevCircles[i].remove();
   }
-  getTileClass(i: number, j: number):string
+  getTileClass(i: number, j: number, isHighLighted:boolean):string
   {
-    if (this.isBoardPieceHighLighted[i][j])
+    if (isHighLighted)
       return (i + j) % 2 === 0 ? 'tile whiteHighLighted' : 'tile blackHighLighted';
     return (i + j) % 2 === 0 ? 'tile whiteTile' : 'tile blackTile';  
   } 
   markPieceAsClicked(posString: string)
   {
-    const oldPos = Utility.standardToNum(posString);
-      this.isBoardPieceHighLighted[oldPos.getRow()][oldPos.getRow()] = true;
-      if (this.currentlyClicked[0] !== -1)
-        this.isBoardPieceHighLighted[this.currentlyClicked[0]]
-      [this.currentlyClicked[1]] = false;
-      this.currentlyClicked[0] = oldPos.getRow();
-      this.currentlyClicked[1] = oldPos.getCol();
+    const newPos = Utility.standardToNum(posString);
+    const elemToHighLight = document.getElementById(posString);
+      //this.isBoardPieceHighLighted[oldPos.getRow()][oldPos.getCol()] = true; 
+      if (this.currentlyClicked !== "")
+      {
+          const prevElem = document.getElementById(this.currentlyClicked);
+          if (prevElem !== null)
+          {
+            const prevPos = Utility.standardToNum(prevElem.id);
+            prevElem.className = this.getTileClass(prevPos.getRow(), prevPos.getCol(),false);
+          }
+      }
+      this.currentlyClicked = posString;
+      if (elemToHighLight !== null)
+        elemToHighLight.className = this.getTileClass(newPos.getRow(), newPos.getCol(),true);
+      this.cdr.detectChanges();
   }
+  //clickOn
 }

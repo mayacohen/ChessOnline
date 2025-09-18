@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Navbar } from '../../components/navbar/navbar';
 import { Board } from '../../components/board/board';
 import { CommonModule } from '@angular/common';
@@ -7,9 +7,11 @@ import { Client } from '../../services/client';
 import { WebsocketService } from '../../services/websocket-service';
 import { timeInterval } from 'rxjs';
 import { ClientServerMessage } from '../../models/client-server-message';
+import { RequestConfirmation } from '../../components/request-confirmation/request-confirmation';
 @Component({
   selector: 'app-main',
-  imports: [Navbar, Board, CommonModule, RequestGameModal],
+  imports: [Navbar, Board, CommonModule, RequestGameModal,
+    RequestConfirmation],
   templateUrl: './main.html',
   styleUrl: './main.scss'
 })
@@ -19,9 +21,12 @@ export class Main implements OnInit, OnDestroy{
   isRequestConfirmation = false;
   isUserLoggedIn = false;
   isPlaying = false;
+  isSendingOrGettingRequest = false;
   message: ClientServerMessage | null = null;
-  constructor (private client:Client, private ws: WebsocketService ){
-  }
+  isWhitePlayer = true; 
+  userGame = "";
+  constructor (private client:Client, private ws: WebsocketService,
+    private cdr:ChangeDetectorRef){}
   ngOnInit(): void {
     this.client.activate().subscribe({
       next: response =>
@@ -33,8 +38,14 @@ export class Main implements OnInit, OnDestroy{
           next: m => 
           {
             console.log(m);
-            if (m.type && m.type === "Game Request")
+            if ('type' in m && m.type === "Game Request")
               this.handleGameRequest(m);
+            //Game response, move, chat?
+            if ('type' in m && m.type === "Game Response")//start game
+              this.gameResponseHandler(m);
+            if ('type' in m && (m.type === "Lose" || m.type === "Draw" || 
+              m.type === "Move" || m.type === "Promotion"))
+              this.client.newServerGameData.next(m);
           },
           error: err => console.log(err)   
         }), 1000);
@@ -45,6 +56,17 @@ export class Main implements OnInit, OnDestroy{
   }
   ngOnDestroy(): void {
     this.ws.closeConnection();
+  }
+  gameResponseHandler(message:ClientServerMessage)
+  {
+    if (this.isPlaying)
+    {
+      console.log("error"); 
+      return
+    }
+    this.isPlaying = true;
+    this.isSendingOrGettingRequest = false;
+    this.cdr.detectChanges();
   }
   setUpReturnModel(message: ClientServerMessage, content:string)
   {
@@ -60,7 +82,8 @@ export class Main implements OnInit, OnDestroy{
   }
   handleGameRequest(message: ClientServerMessage)
   {
-    if (this.isRequestConfirmation || this.isPlaying)
+    if (this.isRequestConfirmation || this.isPlaying || 
+      message.senderUserName == null || this.isSendingOrGettingRequest)
       {
         const m = this.setUpReturnModel(message, "reject");
         this.client.handleGameRequestResponse(m).subscribe({
@@ -69,7 +92,9 @@ export class Main implements OnInit, OnDestroy{
         })
         return;
       } //I don't want users to recieve more then one inventation at the same time
+    this.isSendingOrGettingRequest = true;  
     this.message = message;
+    this.userGame = message.senderUserName;
     this.client.isGameRequestPopUp.next(true);
     this.isRequestConfirmation = true;
     const tempRequestModal = this.isRequestModalOpen;
@@ -84,10 +109,10 @@ export class Main implements OnInit, OnDestroy{
       {
         this.isRequestConfirmation = false;
         this.isRequestModalOpen = tempRequestModal;
+        console.log("Running 2 minutes later:", new Date().toISOString());
       }
-      console.log("Running 2 minutes later:", new Date().toISOString());
     }, finalDelay);
-  
+    this.cdr.detectChanges();
   }
   handleGameRequestModal()
   { 
@@ -99,10 +124,13 @@ export class Main implements OnInit, OnDestroy{
     if (this.message != null)
     {
       var m !: ClientServerMessage;
-      if (retValue)
+      if (retValue && this.isSendingOrGettingRequest)
       {
         m = this.setUpReturnModel(this.message, "accept");
         this.isPlaying = true;
+        this.isWhitePlayer = false;
+        this.isSendingOrGettingRequest = false;
+        this.cdr.detectChanges();
       }
       else
         m = this.setUpReturnModel(this.message, "reject");
@@ -111,6 +139,7 @@ export class Main implements OnInit, OnDestroy{
           {},
         error: err => {
           this.isPlaying = false;
+          this.cdr.detectChanges();
           //write message to user about gme failing to load or something
         } 
       });
