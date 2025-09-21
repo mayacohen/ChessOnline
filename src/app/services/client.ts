@@ -17,6 +17,7 @@ export class Client {
   private userName:string = 'guest';
   private isLogged = false;
   private userPic = "example.png";
+  public gameOpponent = "";
   public getUserPic()
   {
     return this.userPic;

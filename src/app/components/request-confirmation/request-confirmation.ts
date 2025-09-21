@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-
+import { Client } from '../../services/client';
 @Component({
   selector: 'app-request-confirmation',
   imports: [],
@@ -13,7 +13,9 @@ export class RequestConfirmation implements OnInit{
   acceptOrConfirm = "Accept";
   cancelOrReject = "Reject";
   displayedText = "";
+  constructor (private client:Client){}
   ngOnInit(): void {
+    this.client.gameOpponent = this.requestUser;
     if (this.isChallenging)
     {
       this.displayedText = "Do you want to challenge "+ this.requestUser

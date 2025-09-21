@@ -133,7 +133,7 @@ abstract class ChessPiece
   game: ChessGame, 
   isOneStep: boolean
   ): MovePosition[]
-  { ///bug!!!! cont. here
+  { 
     let moveResults: MovePosition[] = [];
     currentPos.moveRow(rowDelta);
     currentPos.moveCol(colDelta);
@@ -150,7 +150,9 @@ abstract class ChessPiece
       currentPos.moveRow(rowDelta);
       currentPos.moveCol(colDelta);
     }
-    return this.returnLegalMoves(isCheckBoard, game, startPosition, moveResults);
+    if (moveResults.length === 0)
+      return [];
+    return ChessPiece.prototype.returnLegalMoves.call(this, isCheckBoard, game, startPosition, moveResults);
   }
   public returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[], ) : MovePosition[]
   {
@@ -358,6 +360,7 @@ class Pawn extends ChessPiece
   {
     return 'P'+super.getString();
   }
+  ////bug: position out of bounds
   override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[]) : MovePosition[]
   {
     if (!(startPosition instanceof Position))
@@ -372,11 +375,9 @@ class Pawn extends ChessPiece
     if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos,isCheckBoard) === null && !this.hasMoved)
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()+1);
-    let piece = game.getPieceFromBoard(checkPos,isCheckBoard);
     if ((checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game)))
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()-1);
-    piece = game.getPieceFromBoard(checkPos,isCheckBoard);
     if (checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game))
       moveResult.push(new MovePosition(startPosition, checkPos));
     return moveResult;
@@ -513,6 +514,7 @@ class ChessGame
       else
         return this.checkBoard[pos.getRow()][pos.getCol()];
     }
+    throw Error("path");
     console.log('bug');
     return null;
   }
@@ -658,15 +660,15 @@ class ChessGame
       this.checkBoard[move.getNewRow()][move.getOldCol()] = null;
     if (piece instanceof King && move.getColAbs() === 2)
     {
-      if (!this.isInCheck())
-        return false;
+      if (this.isInCheck())
+        return true;
       //check recorsive
       this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()] = null;
       this.checkBoard[move.getOldPos().getRow()][move.getOldPos().getCol()+ 
         (move.getNewPos().getCol()-move.getOldPos().getCol())/2] = piece;
       piece.setMoved();
-      if (!this.isInCheck())
-        return false;
+      if (this.isInCheck())
+        return true;
       let rook;
       if (move.getNewCol() > move.getOldCol())
       {
@@ -709,16 +711,22 @@ class ChessGame
       for (let j = 0; j < 8; j++)
       {
         if (this.checkBoard[i][j] instanceof ChessPiece &&
-          this.checkBoard[i][j]?.getWhite() !== this.isWhitePlayer
-          && this.checkBoard[i][j]?.returnLegalMoves(true, this, new Position(i,j)).filter(m =>
-            m.getNewRow() === kingPosition.getRow() && m.getOldCol() === kingPosition.getCol()) !== undefined)
-         {
-          console.log('winning move: from',i,j+"to "+ kingPosition.getRow()+ kingPosition.getCol());
-          return false;
-         }
+          this.checkBoard[i][j]?.getWhite() !== this.isWhitePlayer)
+        {
+          const potentialMoves = this.checkBoard[i][j]?.returnLegalMoves(true, this, new Position(i,j));
+          if (potentialMoves === undefined || potentialMoves.length === 0)
+            continue;
+          const isCheckMove = potentialMoves.find(m => 
+            m.getNewRow() === kingPosition.getRow() && m.getOldCol() === kingPosition.getCol())
+          if (isCheckMove !== undefined)
+          {
+            console.log('winning move: from',isCheckMove?.getOldRow(),isCheckMove?.getOldCol()+"to "+ kingPosition.getRow()+ kingPosition.getCol());
+            return true;
+          }
+        }
       }
     }
-    return true;
+    return false;
   }
   getMovesForPiece(startPosition: Position): MovePosition[] | null
   {
@@ -774,7 +782,7 @@ export class Utility
   static numToStandard(pos:Position): string
   {
     return String.fromCharCode(pos.getCol()+'A'.charCodeAt(0))
-    +String.fromCharCode(8-pos.getRow());
+    +String.fromCharCode('8'.charCodeAt(0)-pos.getRow());
   }
   static standardToNum(code:string):Position
   {

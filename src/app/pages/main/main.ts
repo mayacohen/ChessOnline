@@ -94,6 +94,7 @@ export class Main implements OnInit, OnDestroy{
       } //I don't want users to recieve more then one inventation at the same time
     this.isSendingOrGettingRequest = true;  
     this.message = message;
+    this.client.setUserName(message.receiverUserName?? "bug");
     this.userGame = message.senderUserName;
     this.client.isGameRequestPopUp.next(true);
     this.isRequestConfirmation = true;

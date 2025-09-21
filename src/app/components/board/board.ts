@@ -24,7 +24,6 @@ export class Board implements OnInit, AfterViewInit{
   gameOverType = '';
   lastOppositionMove = '';
   board: string[][] = [];
-  currentlyClicked: string = "";
   @Input() isWhitePlayer : boolean = true;
   isWhiteTurn = true; 
   currentPickedSquare: string | null = null;
@@ -73,7 +72,7 @@ export class Board implements OnInit, AfterViewInit{
   doMoveHTML(ids:string)
   {
     const elem1 = document.getElementById(ids.substring(0,2));
-    const elem2 = document.getElementById(ids.substring(2,2));
+    const elem2 = document.getElementById(ids.substring(2,4));
     if (elem1 != null && elem2 != null)
     {
       const colDiff = Math.abs(ids.charCodeAt(0)-ids.charCodeAt(2));
@@ -98,7 +97,7 @@ export class Board implements OnInit, AfterViewInit{
         }
         this.moveElement(rookStartCol+ids[1],rookEndCol+ids[1]);
       }
-      this.moveElement(ids.substring(0,2), ids.substring(2,2));
+      this.moveElement(ids.substring(0,2), ids.substring(2,4));
     }
   }
   moveElement(idStart:string, idEnd:string)
@@ -217,8 +216,9 @@ export class Board implements OnInit, AfterViewInit{
     const square = document.getElementById(id);
     if (square === null || this.isGameOver)
       return;
-    if (square.childElementCount !== 0 && (square.children[0].id.includes('w') === this.isWhiteTurn && this.isWhitePlayer
-    ===  this.isWhiteTurn))
+    if (square.childElementCount !== 0 && (this.isWhitePlayer
+    ===  this.isWhiteTurn) && (square.children[0].id.includes('w') === this.isWhiteTurn ||
+    square.children[0].className.includes('fa-circle')))
     { 
       if (square.children[0].className.includes("fa-circle")
       || square.children.length === 2)
@@ -257,6 +257,8 @@ export class Board implements OnInit, AfterViewInit{
       else
         this.isWhiteTurn = ! this.isWhiteTurn;
       this.doMoveHTML(this.currentPickedSquare+id); 
+      if (!this.gamelogic.game.getIsWaitingForPromotion())
+        this.currentPickedSquare = null;
     },
       error: err => console.log(err)
     });
@@ -264,7 +266,7 @@ export class Board implements OnInit, AfterViewInit{
   setMoveHighLighted(ids:string)
   {
     const elem1 = document.getElementById(ids.substring(0,2));
-    const elem2 = document.getElementById(ids.substring(2,2));
+    const elem2 = document.getElementById(ids.substring(2,4));
     if (elem1 != null && elem2 != null)
     {
       this.setSquareHiglighted(elem1);
@@ -276,7 +278,7 @@ export class Board implements OnInit, AfterViewInit{
       const pos:Position = Utility.standardToNum(square.id);
       square.className = this.getTileClass(pos.getRow(), pos.getCol(), true);
   } 
-  onChessPieceClick(id:string)//not correct
+  onChessPieceClick(id:string)
   {
     const piece = document.getElementById(id);
     const pos = piece?.parentElement?.id;
@@ -287,7 +289,7 @@ export class Board implements OnInit, AfterViewInit{
       const legalMoves = this.gamelogic.getMovesForPiece(pos);
       this.removeFormerCircles();
       legalMoves?.forEach(move => {
-        const potential = document.getElementById(move.substring(2,2));
+        const potential = document.getElementById(move.substring(2,4));
         if (potential !== null)
         {
           const circle = document.createElement("I");
@@ -295,7 +297,8 @@ export class Board implements OnInit, AfterViewInit{
           if (potential.childElementCount!==0)
             circle.style.fontSize = "35px";
           else
-            circle.style.fontSize = "7px";
+            circle.style.fontSize = "10px";
+          potential.appendChild(circle);
         }
       });
     }
@@ -317,16 +320,17 @@ export class Board implements OnInit, AfterViewInit{
     const newPos = Utility.standardToNum(posString);
     const elemToHighLight = document.getElementById(posString);
       //this.isBoardPieceHighLighted[oldPos.getRow()][oldPos.getCol()] = true; 
-      if (this.currentlyClicked !== "")
+      if (this.currentPickedSquare !== null)
       {
-          const prevElem = document.getElementById(this.currentlyClicked);
+          const prevElem = document.getElementById(this.currentPickedSquare);
+          this.removeFormerCircles();
           if (prevElem !== null)
           {
             const prevPos = Utility.standardToNum(prevElem.id);
             prevElem.className = this.getTileClass(prevPos.getRow(), prevPos.getCol(),false);
           }
       }
-      this.currentlyClicked = posString;
+      this.currentPickedSquare = posString;
       if (elemToHighLight !== null)
         elemToHighLight.className = this.getTileClass(newPos.getRow(), newPos.getCol(),true);
       this.cdr.detectChanges();
