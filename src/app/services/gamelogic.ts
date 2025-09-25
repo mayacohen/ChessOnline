@@ -120,7 +120,7 @@ abstract class ChessPiece
       (game.getPieceFromBoard(positions.getOldPos(), isCheckBoard) === null) 
       || (game.getPieceFromBoard(positions.getNewPos(), isCheckBoard) !== null 
     && game.getPieceFromBoard(positions.getNewPos(), isCheckBoard)?.isWhite ===
-     game.getPieceFromBoard(positions.getNewPos(), isCheckBoard)?.isWhite))
+     game.getPieceFromBoard(positions.getOldPos(), isCheckBoard)?.isWhite))
       return false;
     return true;
   }
@@ -159,7 +159,7 @@ abstract class ChessPiece
     if (moves === undefined)
       return [];
     return moves.filter(m =>
-      this.isLegalMovement(m, isCheckBoard, game)
+      ChessPiece.prototype.isLegalMovement(m, isCheckBoard, game)
     );
   }
   abstract copy(): ChessPiece;
@@ -360,7 +360,34 @@ class Pawn extends ChessPiece
   {
     return 'P'+super.getString();
   }
-  ////bug: position out of bounds
+  returnEnPassant(isCheckBoard:boolean, game:ChessGame, startPosition:Position) : MovePosition[]
+  {
+    let moveResult : MovePosition[] = [];
+    if ((!this.getWhite() && startPosition?.getRow() === 4) || 
+    (this.getWhite() && startPosition?.getRow() === 3))
+    {
+      const moveDirection = super.getWhite() ? -1 : 1;
+      const pawnsToEat = [ new Position(startPosition.getRow(), startPosition.getCol()+1),
+      new Position(startPosition.getRow(), startPosition.getCol()-1)];
+      pawnsToEat.forEach(pos =>
+      {
+        if (pos.isLegalPosition())
+        {
+          const toEat = game.getPieceFromBoard(pos,isCheckBoard);
+          const posPotential = game.getPieceFromBoard(
+          new Position(startPosition.getRow()+moveDirection, 
+          pos.getCol()), isCheckBoard);
+          if (posPotential === null && toEat instanceof Pawn 
+            && toEat.getWhite() !== this.getWhite() && 
+            toEat.isFirstMoveLastTurn)
+            moveResult.push(new MovePosition(startPosition, 
+              new Position(startPosition.getRow()+moveDirection, 
+          pos.getCol())));
+        }
+      });
+    }
+    return moveResult;
+  }
   override returnLegalMoves(isCheckBoard:boolean, game:ChessGame, startPosition?:Position, moves?:MovePosition[]) : MovePosition[]
   {
     if (!(startPosition instanceof Position))
@@ -375,12 +402,13 @@ class Pawn extends ChessPiece
     if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos,isCheckBoard) === null && !this.hasMoved)
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()+1);
-    if ((checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game)))
+    if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos, isCheckBoard) != null)
       moveResult.push(new MovePosition(startPosition, checkPos));
     checkPos = new Position(startPosition.getRow()+moveDirection, startPosition.getCol()-1);
-    if (checkPos.isLegalPosition() && this.isLegalMovement(new MovePosition(startPosition,checkPos), isCheckBoard, game))
+    if (checkPos.isLegalPosition() && game.getPieceFromBoard(checkPos, isCheckBoard) != null)
       moveResult.push(new MovePosition(startPosition, checkPos));
-    return moveResult;
+    moveResult.push(...this.returnEnPassant(isCheckBoard,game,startPosition));
+    return super.returnLegalMoves(isCheckBoard, game, startPosition, moveResult);
   } 
   constructor(isWhite:boolean)
   {
@@ -571,6 +599,21 @@ class ChessGame
     }
     this.setMove(movePosition);
   } 
+  setPawnsLastMoveTurn(pos:Position)
+  {
+    for (let i =0; i< 8; i++)
+    {
+      for (let j=0;j<8;j++)
+      {
+        let pawn = this.board[i][j];
+        if (!(i=== pos.getRow() && j===pos.getCol()) && 
+         pawn instanceof Pawn)
+          {
+            pawn.setHasMovedTurn();
+          }
+      }
+    }
+  }
   private setMove(movePosition: MovePosition)
   {
     const piece = this.getPieceFromBoard(movePosition.getOldPos(), false);
@@ -592,7 +635,7 @@ class ChessGame
       if (piece instanceof Pawn && movePosition.getColAbs() === 1 && 
       movePosition.getRowAbs() === 1 && 
       this.getPieceFromBoard(movePosition.getNewPos(), false) === null)
-        this.board[movePosition.getNewRow()][movePosition.getOldCol()] = null;
+        this.board[movePosition.getOldRow()][movePosition.getNewCol()] = null;
       if (piece instanceof King && movePosition.getColAbs() === 2)
       {
         let rook;
@@ -618,7 +661,9 @@ class ChessGame
         piece.setMoved();
       this.board[movePosition.getNewRow()][movePosition.getNewCol()] = 
       this.board[movePosition.getOldRow()][movePosition.getOldCol()];
-      this.board[movePosition.getOldRow()][movePosition.getOldCol()] = null;  
+      this.board[movePosition.getOldRow()][movePosition.getOldCol()] = null; 
+      this.setPawnsLastMoveTurn(movePosition.getNewPos());
+      this.isWhiteTurn = !this.isWhiteTurn; 
     }
   }
   private setCheckBoard()
@@ -776,7 +821,7 @@ export class Utility
     // if (movement.length !== 4)
     //   return null;
     const oldPos = this.standardToNum(movement.substring(0,2));
-    const newPos = this.standardToNum(movement.substring(2,2));
+    const newPos = this.standardToNum(movement.substring(2,4));
     return new MovePosition(oldPos, newPos);
   }
   static numToStandard(pos:Position): string

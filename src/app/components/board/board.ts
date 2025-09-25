@@ -77,9 +77,11 @@ export class Board implements OnInit, AfterViewInit{
     {
       const colDiff = Math.abs(ids.charCodeAt(0)-ids.charCodeAt(2));
       const diff = colDiff+Math.abs(ids.charCodeAt(1)-ids.charCodeAt(3));
-      if (elem1.className.includes('pawn') && diff === 2)
+      if (elem1.children.length > 0 && 
+        elem1.children[0].className.includes('pawn') && 
+        diff === 2 && colDiff === 1 && elem2.children.length === 0)
       {
-        const pawnRemove = document.getElementById(ids[0]+ids[3]);
+        const pawnRemove = document.getElementById(ids[2]+ids[1]);
         if (pawnRemove === null || pawnRemove.children.length < 1)
         {
           console.log('bug');
@@ -104,13 +106,15 @@ export class Board implements OnInit, AfterViewInit{
   {
     const startSq = document.getElementById(idStart);
     const endSq = document.getElementById(idEnd);
-    if (endSq === null ||endSq.children.length > 0
-      ||startSq === null ||startSq.children.length < 1
+    if (endSq === null ||
+      startSq === null ||startSq.children.length < 1
     ) 
     {
       console.log('bug');
       return;
     }
+    if (endSq.children.length > 0)
+        endSq.removeChild(endSq.children[0]); 
    endSq.appendChild(startSq.children[0]);
   }
   ngAfterViewInit(): void {
@@ -218,10 +222,10 @@ export class Board implements OnInit, AfterViewInit{
       return;
     if (square.childElementCount !== 0 && (this.isWhitePlayer
     ===  this.isWhiteTurn) && (square.children[0].id.includes('w') === this.isWhiteTurn ||
-    square.children[0].className.includes('fa-circle')))
+    square.children[square.childElementCount-1].className.includes('fa-circle')))
     { 
-      if (square.children[0].className.includes("fa-circle")
-      || square.children.length === 2)
+      if (square.children.length === 2 ||
+        square.children[0].className.includes("fa-circle"))
         this.doMove(square);
       else if (square.children[0].className.includes("fa-chess"))
         this.onChessPieceClick(square.children[0].id);
@@ -230,7 +234,7 @@ export class Board implements OnInit, AfterViewInit{
   returnCSM(type:string, content: string): ClientServerMessage
   {
      return {
-      receiverUserName : this.opponentUserName,
+      receiverUserName : this.client.gameOpponent,
       content: content,
       senderUserName : this.client.getUserName(),
       date : null,
@@ -255,7 +259,10 @@ export class Board implements OnInit, AfterViewInit{
       if (this.gamelogic.game.getIsWaitingForPromotion())
         this.isPromotionWindowOpen = true;
       else
+      {
         this.isWhiteTurn = ! this.isWhiteTurn;
+        this.cdr.detectChanges();
+      }
       this.doMoveHTML(this.currentPickedSquare+id); 
       if (!this.gamelogic.game.getIsWaitingForPromotion())
         this.currentPickedSquare = null;
@@ -306,8 +313,8 @@ export class Board implements OnInit, AfterViewInit{
   removeFormerCircles()
   {
     const prevCircles = document.getElementsByClassName("fa-circle");
-    for (let i = 0; i < prevCircles.length; i++)
-      prevCircles[i].remove();
+    while (prevCircles.length !== 0)
+      prevCircles[0].remove();
   }
   getTileClass(i: number, j: number, isHighLighted:boolean):string
   {

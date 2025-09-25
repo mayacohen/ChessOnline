@@ -9,6 +9,7 @@ import { ClientMessageModel } from '../models/client-message-model';
 import { ClientConversationModel } from '../models/client-conversation-model';
 import { ClientServerMessage } from '../models/client-server-message';
 import { LoggedDTO } from '../models/logged-dto';
+import { StringReturn } from '../models/string-return';
 @Injectable({
   providedIn: 'root'
 })
@@ -96,14 +97,15 @@ export class Client {
   {
     return this.http.put<void>(this.serverUrl+"GameResponse",m);
   }
-  public setMove(m: ClientServerMessage) : Observable<void>
+  public setMove(m: ClientServerMessage) : Observable<StringReturn>
   {
-    return this.http.put<void>(this.serverUrl+"GameMove",m);
+    return this.http.put<StringReturn>(this.serverUrl+"GameMove",m);
   }
-  public setPromotion(m: ClientServerMessage) : Observable<void>
+  public setPromotion(m: ClientServerMessage) : Observable<StringReturn>
   {
-    return this.http.put<void>(this.serverUrl+"Promotion",m);
+    return this.http.put<StringReturn>(this.serverUrl+"Promotion",m);
   }
+  //retry
   // get and send user details,
   // chess communication in chess logic?
 }
