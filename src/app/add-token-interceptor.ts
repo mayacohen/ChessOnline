@@ -5,6 +5,8 @@ import { catchError, switchMap, throwError } from 'rxjs';
 
 export const addTokenInterceptor: HttpInterceptorFn = (req, next) => {
   console.log(req);
+  if (req.url.includes('/Refresh'))
+    return next(req);
   const http = inject(HttpClient);
   const accessToken = sessionStorage.getItem("accessToken");
   if (accessToken) {
@@ -23,11 +25,11 @@ export const addTokenInterceptor: HttpInterceptorFn = (req, next) => {
         }
         return http.post<any>("https://localhost:7070/Refresh", { refreshToken })
           .pipe(
-            switchMap((response) => {
-              sessionStorage.setItem("accessToken", response.accessToken);
+            switchMap((token) => {
+              sessionStorage.setItem("accessToken", token);
               const retryReq = req.clone({
                 setHeaders: {
-                  Authorization: `Bearer ${response.accessToken}`
+                  Authorization: `Bearer ${token}`
                 }
               });
               return next(retryReq);

@@ -9,6 +9,41 @@
     display: grid;
     grid-template-columns: repeat(8, 50px);
     grid-template-rows: repeat(8, 50px);
+    position: relative;
+    z-index: 1;
+}
+.board-and-row-col-indices
+{
+    width: 400px;
+    height: 400px;
+    position: relative;
+    .row-indices, .col-indices
+    {
+        position: absolute;
+        z-index: 20;
+        display: flex;
+        color: chartreuse;
+        background: transparent;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+    .row-indices
+    {
+        max-width: 100%;
+        top: 3px;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        padding: 0 4px;
+    }
+    .col-indices
+    {
+        flex-direction: column;
+        top: 0;
+        left: 3px;
+        height: 100%;
+        width: 20px;
+    }
 }
 .board
 {

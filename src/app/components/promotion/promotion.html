@@ -2,14 +2,14 @@
     <div class="modal-content">
         <h3 class="fancy-text">Please click to promote to:</h3>
         <div class="container">
-            <div (Click)='onClick("b")'>
+            <div (click)='onClick("b")'>
                 <i [ngClass]="isWhitePlayer? 'fa-solid fa-chess-bishop whitePiece': 'fa-solid fa-chess-bishop blackPiece'"></i>
             </div>
-            <div (Click)='onClick("n")'>
+            <div (click)='onClick("n")'>
                 <i [ngClass]="isWhitePlayer? 'fa-solid fa-chess-knight whitePiece': 'fa-solid fa-chess-knight blackPiece'"></i></div>
-            <div (Click)='onClick("r")'>
+            <div (click)='onClick("r")'>
                 <i [ngClass]="isWhitePlayer? 'fa-solid fa-chess-rook whitePiece': 'fa-solid fa-chess-rook blackPiece'"></i></div>
-            <div (Click)='onClick("q")'>
+            <div (click)='onClick("q")'>
                 <i [ngClass]="isWhitePlayer? 'fa-solid fa-chess-queen whitePiece': 'fa-solid fa-chess-queen blackPiece'"></i></div>
         </div>
     </div>

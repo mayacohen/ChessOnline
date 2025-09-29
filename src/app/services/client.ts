@@ -105,6 +105,10 @@ export class Client {
   {
     return this.http.put<StringReturn>(this.serverUrl+"Promotion",m);
   }
+  public retryMove(m:ClientServerMessage): Observable<void>
+  {
+    return this.http.put<void>(this.serverUrl+"Retry",m);
+  }
   //retry
   // get and send user details,
   // chess communication in chess logic?

@@ -497,7 +497,7 @@ class King extends ChessPiece
   {
     const r = game.getPieceFromBoard(new Position(pos.getRow(),
       col),isCheckBoard);
-    if (r instanceof Rook && r.getMoved())
+    if (r instanceof Rook && !r.getMoved())
     {
       const min = Math.min(pos.getCol(), col), max = Math.max(pos.getCol(), col);
       for (let i = min+1; i < max; i++)
@@ -642,25 +642,15 @@ class ChessGame
       if (piece instanceof King && movePosition.getColAbs() === 2)
       {
         let rook;
-        if (movePosition.getOldCol() > movePosition.getNewRow())
-        {
-          rook = this.checkBoard[movePosition.getOldRow()][0];
-          this.checkBoard[movePosition.getOldRow()][0] = null;
-        }
-        else
-        {
-          rook = this.checkBoard[movePosition.getOldRow()][7];
-          this.checkBoard[movePosition.getOldRow()][7] = null;
-        }
-        this.checkBoard[movePosition.getOldRow()][movePosition.getOldCol()+ 
+        let rookOldCol = movePosition.getOldCol() > movePosition.getNewCol() ? 0 : 7;
+        rook = this.board[movePosition.getOldRow()][rookOldCol];
+        this.board[movePosition.getOldRow()][rookOldCol] = null;
+        this.board[movePosition.getOldRow()][movePosition.getOldCol()+ 
         (movePosition.getNewCol()-movePosition.getOldCol())/2] =  rook;
         if (rook instanceof Rook)
-        {
           rook.setMoved();
-          piece.setMoved();
-        }
       }
-      if (piece instanceof Pawn)
+      if (piece instanceof Pawn || piece instanceof Rook || piece instanceof King)
         piece.setMoved();
       this.board[movePosition.getNewRow()][movePosition.getNewCol()] = 
       this.board[movePosition.getOldRow()][movePosition.getOldCol()];
@@ -814,8 +804,6 @@ class ChessGame
       this.isPromotion = false;
     }
   }
-  //checkValidityCastling(startPosition: Position, )
-
 }
 export class Utility
 {
@@ -856,7 +844,6 @@ export class Utility
     return res;
   }
 }
-//class utility to translate string to idc.
 @Injectable({
   providedIn: 'root'
 })

@@ -9,9 +9,10 @@ import { PlayerDetailsForGame } from '../player-details-for-game/player-details-
 import { ClientServerMessage } from '../../models/client-server-message';
 import { GameOver } from '../game-over/game-over';
 import { Promotion } from '../promotion/promotion';
+import { StringReturn } from '../../models/string-return';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, GameTracker, PlayerDetailsForGame, GameOver, Promotion],
+  imports: [CommonModule, GameTracker, /*PlayerD7etailsForGame,*/ GameOver, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None
@@ -21,11 +22,14 @@ export class Board implements OnInit, AfterViewInit{
   isGameOver = false;
   isGameOverAndMessage = false;
   isPromotionWindowOpen = false;
+  promotedSqr : HTMLElement | null = null;
   gameOverType = '';
   lastOppositionMove = '';
   board: string[][] = [];
   @Input() isWhitePlayer : boolean = true;
   isWhiteTurn = true; 
+  rowIndices = ['A','B','C','D','E','F','G','H'];
+  colIndices = ['1','2','3','4','5','6','7','8'];
   currentPickedSquare: string | null = null;
   constructor(private client:Client, private gamelogic:Gamelogic,
     private cdr: ChangeDetectorRef){}
@@ -55,16 +59,18 @@ export class Board implements OnInit, AfterViewInit{
           if (this.gamelogic.game === undefined)
             console.log('bug');
           this.gamelogic.game.setMoveOpposition(Utility.stringToMovePos(csm.content.substring(0,4)));
+          this.doMoveHTML(csm.content.substring(0,4));
           if (csm.content.length == 5)
-            this.gamelogic.game.setPromotion(Utility.standardToNum(csm.content.substring(0,2))
-          ,csm.content[4]);
-          this.doMoveHTML(csm.content);
+          {
+            const parentElem = document.getElementById(csm.content.substring(2,4));
+            if (parentElem != null)
+              this.doClientSidePromotion(csm.content[4], parentElem);
+          }
         }
         if (csm.type !== "default" && csm.type !=="Move")
         {
-          this.isGameOver = true;
-          this.gameOverType = csm.type;
-          this.isGameOverAndMessage = true;
+          this.isWhiteTurn = !this.isWhiteTurn;
+          this.setGameOver(csm.type);
         }
         this.cdr.detectChanges();
       },
@@ -91,7 +97,8 @@ export class Board implements OnInit, AfterViewInit{
         }
         pawnRemove.removeChild(pawnRemove.children[0]);
       }
-      if (elem1.className.includes('king') && colDiff===2)
+      if (elem1.children.length > 0 && 
+        elem1.children[0].className.includes('king') && colDiff===2)
       {
         let rookStartCol = 'A', rookEndCol='D';
         if (ids.charCodeAt(2) > ids.charCodeAt(0))
@@ -187,9 +194,6 @@ export class Board implements OnInit, AfterViewInit{
     }
     this.gamelogic.startNewGame(this.isWhitePlayer);
   }
-  //click on circled place() (or on circle)
-  //future - drag and drop.
-  //if (not your turn) - add hourglass
   clearHighLightBoard()
   {
     for (let i = 0; i< 8; i++)
@@ -210,13 +214,39 @@ export class Board implements OnInit, AfterViewInit{
   }
   getChosenPromotion(promotion: string)
   {
+    this.isPromotionWindowOpen = false;
     this.client.setPromotion(this.returnCSM("Promotion", promotion[0])).subscribe({
       next: () => {
-        this.isWhiteTurn = ! this.isWhiteTurn;}
-        //turn over process
+        this.isWhiteTurn = ! this.isWhiteTurn;
+        if (this.promotedSqr !== null && this.promotedSqr.children.length > 0)
+          this.doClientSidePromotion(promotion, this.promotedSqr);
+      }
       , error: err => console.log(err)
     });
   }
+  doClientSidePromotion(char: string, parentSqr: HTMLElement)
+  {
+        const promotedI = parentSqr.children[0];
+        switch(char)
+        {
+          case 'n':
+            promotedI.className = promotedI.className.replace('pawn', 'knight');
+            break;
+          case 'q':
+            promotedI.className = promotedI.className.replace('pawn', 'queen');
+            break;
+          case 'b':
+            promotedI.className = promotedI.className.replace('pawn', 'bishop');
+            break;
+          case 'r':
+            promotedI.className = promotedI.className.replace('pawn', 'rook');
+            break;  
+        }
+        this.gamelogic.game.setPromotion(Utility.standardToNum(
+          parentSqr.id), char); 
+        this.cdr.detectChanges();
+  }
+
   onSquareClick(id:string)
   {
     const square = document.getElementById(id);
@@ -252,21 +282,42 @@ export class Board implements OnInit, AfterViewInit{
     }
     const id = square.id;
     const message = this.returnCSM("Move", this.currentPickedSquare+id);
-    this.client.setMove(message).subscribe({next: ()=> {
+    this.client.setMove(message).subscribe({next: returnString => {
       this.gamelogic.setMove(this.currentPickedSquare+id);
       this.removeFormerCircles();
       this.setSquareHiglighted(square);
       if (this.gamelogic.game.getIsWaitingForPromotion())
+      {
         this.isPromotionWindowOpen = true;
+        this.promotedSqr = document.getElementById(id);
+      }
       else
         this.isWhiteTurn = ! this.isWhiteTurn;
       this.doMoveHTML(this.currentPickedSquare+id); 
       if (!this.gamelogic.game.getIsWaitingForPromotion())
         this.currentPickedSquare = null;
-      this.cdr.detectChanges();
+      if (returnString.retValue === "Win" || returnString.retValue === "Draw")
+      {
+        this.setGameOver(returnString.retValue);
+      }
+      if (returnString.retValue === "Retry")
+      {
+        this.client.retryMove(message).subscribe({
+          error: err =>  {
+            this.setGameOver("Lost Connectivity");
+          }
+        });
+      }
+      this.cdr.detectChanges();   
     },
       error: err => console.log(err)
     });
+  }
+  setGameOver(message: string)
+  {
+    this.isGameOver = true;
+    this.gameOverType = message;
+    this.isGameOverAndMessage = true;
   }
   setMoveHighLighted(ids:string)
   {
@@ -340,5 +391,4 @@ export class Board implements OnInit, AfterViewInit{
         elemToHighLight.className = this.getTileClass(newPos.getRow(), newPos.getCol(),true);
       this.cdr.detectChanges();
   }
-  //clickOn
 }

@@ -4,37 +4,51 @@
         <!-- <app-player-details-for-game 
             [user] = 'opponent'
         ></app-player-details-for-game> -->
-        <div class="container">
-            @for (row of board; track row; let i = $index)
-            {
-                @for (sq of row; track sq; let j = $index)
+        <div class="board-and-row-col-indices">
+            <div class="container">
+                @for (row of board; track row; let i = $index)
                 {
-                    <div [id]='board[i][j]'  
-                    (click)="onSquareClick(board[i][j])">
+                    @for (sq of row; track sq; let j = $index)
+                    {
+                        <div [id]='board[i][j]'  
+                        (click)="onSquareClick(board[i][j])">
+                        </div>
+                    }
+                }
+                @if (isWhitePlayer !== isWhiteTurn)
+                {
+                    <div id="hourglassModal">
+                        <div>
+                            <img src="hourglass-svg.svg" class="spin" alt='https://dryicons.com/free-icons/hourglass'>
+                        </div>
                     </div>
                 }
-            }
-            @if (isWhitePlayer !== isWhiteTurn)
-            {
-                <div id="hourglassModal">
-                    <div>
-                        <img src="hourglass-svg.svg" class="spin" alt='https://dryicons.com/free-icons/hourglass'>
-                    </div>
-                </div>
-            }
-            @if (isGameOverAndMessage)
-            {
-                <app-game-over
-                [gameOverType]="gameOverType"
-                [opponentUserName]="opponentUserName"
-                (closeModalOutput)="closeGameOverMessage()"
-                ></app-game-over>
-            }
-            @if (isPromotionWindowOpen)
-            {
-                <app-promotion [isWhitePlayer]="isWhitePlayer"
-                (promotion)="getChosenPromotion($event)"></app-promotion>
-            }
+                @if (isGameOverAndMessage)
+                {
+                    <app-game-over
+                    [gameOverType]="gameOverType"
+                    [opponentUserName]="opponentUserName"
+                    (closeModalOutput)="closeGameOverMessage()"
+                    ></app-game-over>
+                }
+                @if (isPromotionWindowOpen)
+                {
+                    <app-promotion [isWhitePlayer]="isWhitePlayer"
+                    (promotion)="getChosenPromotion($event)"></app-promotion>
+                }
+            </div>
+            <div class="row-indices">
+                @for(index of rowIndices; track index)
+                {
+                    <div>{{index}}</div>
+                }
+            </div>
+            <div class="col-indices">
+                @for(index of colIndices; track index)
+                {
+                    <div>{{index}}</div>
+                }
+            </div>
         </div>
         <!-- <app-player-details-for-game 
             [user] = 'player'
