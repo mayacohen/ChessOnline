@@ -1,0 +1,35 @@
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: box-shadow .12s ease, transform .06s ease;
+}
+
+.google-btn:active { transform: translateY(1px); }
+.google-btn:focus { outline: 3px solid rgba(66,133,244,0.25); outline-offset: 2px; }
+
+/* Google-colors for each letter */
+.google-mark { display:inline-flex; gap:2px; font-weight:700; font-size:16px; }
+.google-mark span { display:inline-block; line-height:1; }
+
+/* Official-ish palette */
+.g-blue    { color: #4285F4; }  /* G */
+.o-red     { color: #EA4335; }  /* o */
+.o-yellow  { color: #FBBC05; }  /* o */
+.g-blue2   { color: #4285F4; }  /* g */
+.l-green   { color: #34A853; }  /* l */
+.e-red2    { color: #EA4335; }  /* e */
+
+/* Button text styling */
+.btn-text { color: #202124; font-weight: 500; }
+
+/* small spacing tweaks for visual balance */
+.g { transform: translateY(-1px); }

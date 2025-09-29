@@ -1,0 +1,34 @@
+:host
+{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: fixed;  
+}
+button
+{
+    width: fit-content;
+    height: fit-content;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-size: 18px;
+}
+.container
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: calc(100% - var(--width-navbar));
+    img
+    {
+        height: 300px;
+        width: 300px;
+    }
+}
+@media screen and (max-width:var(----width-shrink-navbar)){
+    .container
+    {
+        width: 100%;
+    }
+}

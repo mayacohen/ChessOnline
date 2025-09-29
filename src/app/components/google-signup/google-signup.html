@@ -1,0 +1,20 @@
+<button class="google-btn" aria-label="Sign in with Google" id="googleBtn">
+    <span class="google-mark" aria-hidden="true">
+        <span class="g g-blue">G</span>
+        <span class="o o-red">o</span>
+        <span class="o o-yellow">o</span>
+        <span class="g g-blue2">g</span>
+        <span class="l l-green">l</span>
+        <span class="e e-red2">e</span>
+    </span>
+    <span class="btn-text">Sign in with Google</span>
+</button>
+<!-- g_id_onload contains Google Identity Services settings -->
+    <div
+      id="g_id_onload"
+      data-auto_prompt="false"
+      data-callback="handleCredentialResponse"
+      data-client_id="PUT_YOUR_WEB_CLIENT_ID_HERE"
+    ></div>
+    <!-- g_id_signin places the button on a page and supports customization -->
+    <div class="g_id_signin"></div>

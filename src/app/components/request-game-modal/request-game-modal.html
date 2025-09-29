@@ -1,0 +1,29 @@
+@if(isRequestConfirmation)
+{
+    <app-request-confirmation [requestUser]="userGame" 
+    (emitIsConfirm)="handleRequestConfirmation($event)">
+    </app-request-confirmation>
+}
+@else
+{
+    <div class="modal" (click)="closeModal()">
+        <div class="modal-content" (click)="unexpectedEventsHandler($event)">
+            <button class="close-btn" (click)="closeModal()">&times;</button>
+            <h3>Request Game</h3>
+            @for (user of activeUsers; track user)
+            {
+                <div (click)="sendGameRequest(user)">
+                    <!-- <app-player-details-for-game [user]="user">
+                    </app-player-details-for-game> -->
+                    <div>{{user}}</div>
+                </div>
+            }
+            @empty
+            {
+                <h3>{{emptyMessage}}</h3>
+            }
+            <input type="text" placeholder="search for user..." 
+            [(ngModel)]="searchQuery"/>
+        </div>
+    </div>
+}

@@ -1,0 +1,156 @@
+<div #modal class="modal" (click)="closeModal($event)">
+  <div class="modal-content">
+    <button class="close-btn" #closeButton (click)="closeModal($event)">&times;</button>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        @if (isEmailTaken && isUserNameTaken)
+        {
+          <small class="text-danger">
+                  The email and user name you entered are already in use.    
+          </small>
+        }
+        @else 
+        {
+          @if (isEmailTaken)
+          {
+            <small class="text-danger">
+                    The email you entered is already in use.    
+            </small>
+          }
+          @if (isUserNameTaken)
+          {
+            <small class="text-danger">
+                    The user name you entered is already in use.   
+            </small>
+          }
+          @if (isGeneralError)
+          {
+             <small class="text-danger">
+                    Something went wrong. Please try again.    
+            </small>
+          }
+        }
+        <label for="userName">User Name: </label>
+        <input
+          id="userName"
+          autocomplete="name"
+          formControlName="userName"
+          type="text"
+          class="form-control"
+        />
+        @if(signupForm.get('userName')?.invalid && 
+        (signupForm.get('userName')?.touched 
+        || signupForm.get('userName')?.dirty))
+        {
+          @if(signupForm.get('userName')?.errors?.['required'])
+          {
+              <small class="text-danger">
+                  Username is required.
+              </small>
+          }
+          @if(signupForm.get('userName')?.errors?.['minlength'])
+          {
+              <small class="text-danger">
+                  Username must be at least 3 characters.
+              </small>
+          }
+          @if(signupForm.get('userName')?.errors?.['illegalUsername'])
+          {
+            <small class="text-danger">
+                  Username must not start with 'guest-'
+              </small>
+          }
+        }
+      </div>
+      <div class="form-group">
+        <label for="email">Email: </label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          class="form-control"
+          autocomplete="email"
+        />
+        @if (signupForm.get('email')?.invalid &&
+        (signupForm.get('email')?.touched 
+        || signupForm.get('email')?.dirty))
+        {
+          @if(signupForm.get('email')?.errors?.['required'])
+          {
+              <small class="text-danger">
+                  Email is required.    
+              </small>
+          }
+          @if(signupForm.get('email')?.errors?.['email'])
+          {
+              <small class="text-danger">
+                  Enter a valid email.    
+              </small>
+          }
+        }
+      </div>
+      <div class="form-group">
+        <label for="password">Password: </label>
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
+          class="form-control"
+        />
+        @if (signupForm.get('password')?.invalid && 
+        (signupForm.get('password')?.touched ||
+        signupForm.get('password')?.dirty))
+        {
+          @if(signupForm.get('password')?.errors?.['required'])
+          {
+              <small class="text-danger">
+                  Password is required.
+              </small>
+          }
+          @if(signupForm.get('password')?.errors?.['passwordStrength'])
+          {
+              <small class="text-danger">
+                  Password must contain at least 8 characters, one uppercase letter, one digit, and one special character.
+              </small>
+          }
+        }
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password: </label>
+        <input
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          type="password"
+          class="form-control"
+          (keydown.enter)="onSubmit()"
+        />
+        @if((signupForm.get('confirmPassword')?.invalid ||
+        signupForm.errors?.['passwordMismatch']) &&
+        (signupForm.get('confirmPassword')?.touched
+          || signupForm.get('confirmPassword')?.dirty))
+        {
+          @if(signupForm.get('confirmPassword')?.errors?.['required'])
+          {
+              <small class="text-danger">
+                  Confirm Password is required.
+              </small>
+          }
+          @if(signupForm.errors?.['passwordMismatch'])
+          {
+              <small class="text-danger">
+                  Passwords must match.
+              </small>
+          }
+        }
+      </div>
+      <button type="submit" class="fancy-text form-button" [disabled]="signupForm.invalid">
+        Submit
+      </button>
+    </form>
+    <div>OR</div>
+    <app-google-signup></app-google-signup>
+    <app-facebook-signup></app-facebook-signup>
+  </div>
+</div>
+
+

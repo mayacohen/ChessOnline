@@ -1,0 +1,111 @@
+@use '../../../styles.scss' as *;
+.modal-content-chat
+{
+    height: 400px;
+    width: 300px;
+    @include modal-content-base;
+}
+.closeButtonChat
+{
+    font-size: 20px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+.user-messaging
+{
+    display: flex;
+    background-color: white;
+    column-gap: 10px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+    img
+    {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+}
+.messageContainer
+{
+    background-color: rgb(211, 248, 222);
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    min-height: 300px;
+    max-height: 300px;
+    width: 100%;
+}
+.sent-messages
+{
+    align-self: flex-end;
+    background-color: rgb(213, 247, 201);
+}
+.recieved-messages
+{
+    background-color: rgb(244, 250, 242);
+}
+.sent-messages, .recieved-messages
+{
+    color: black;
+    display: flex;
+    flex-direction: row;
+    border-radius: 7px;
+    display: flex;
+    padding: 5px 3px;
+    white-space: wrap;
+    p
+    {
+        font-size: 10px;
+        color: rgb(95, 93, 93);
+    }
+}
+.message
+{
+    max-width: 70%;
+    width: fit-content;
+    margin: 3px;
+}
+.send-new-message-container
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    > *
+    {
+        background-color: white;
+        border-color: black;
+    }
+    input
+    {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        margin: 2px 0;
+        padding: 7px 0;
+        ::placeholder
+        {
+            color: rgb(223, 222, 222);
+        }
+        border-right: 0;
+    }
+    button
+    {
+        padding: 7px 0;
+        margin: 2px 0;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border-left: 0;
+        i
+        {
+            border-radius: 50%;
+            border: 1px solid black;
+        }
+    }
+}
+button:hover
+{
+    cursor: pointer;
+}

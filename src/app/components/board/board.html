@@ -1,0 +1,44 @@
+<div class="layout">
+    <div class="board">
+        <!-- do something for alt? -->
+        <!-- <app-player-details-for-game 
+            [user] = 'opponent'
+        ></app-player-details-for-game> -->
+        <div class="container">
+            @for (row of board; track row; let i = $index)
+            {
+                @for (sq of row; track sq; let j = $index)
+                {
+                    <div [id]='board[i][j]'  
+                    (click)="onSquareClick(board[i][j])">
+                    </div>
+                }
+            }
+            @if (isWhitePlayer !== isWhiteTurn)
+            {
+                <div id="hourglassModal">
+                    <div>
+                        <img src="hourglass-svg.svg" class="spin" alt='https://dryicons.com/free-icons/hourglass'>
+                    </div>
+                </div>
+            }
+            @if (isGameOverAndMessage)
+            {
+                <app-game-over
+                [gameOverType]="gameOverType"
+                [opponentUserName]="opponentUserName"
+                (closeModalOutput)="closeGameOverMessage()"
+                ></app-game-over>
+            }
+            @if (isPromotionWindowOpen)
+            {
+                <app-promotion [isWhitePlayer]="isWhitePlayer"
+                (promotion)="getChosenPromotion($event)"></app-promotion>
+            }
+        </div>
+        <!-- <app-player-details-for-game 
+            [user] = 'player'
+        ></app-player-details-for-game> -->
+    </div>
+    <app-game-tracker></app-game-tracker>
+</div>

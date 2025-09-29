@@ -1,0 +1,27 @@
+<app-navbar></app-navbar>
+@if(isPlaying)
+{
+    <app-board [isWhitePlayer]="isWhitePlayer"></app-board>
+}
+@else
+{
+    <div class="container">
+        <h3>Play Chess</h3>
+        <h3>Connect with friends</h3>
+        <h2>Have fun!</h2>
+        <img src="logo.webp">
+        <button class="fancy-text" (click)="isRequestModalOpen = true;">Start</button>
+    </div>
+    @if(isRequestModalOpen)
+    {
+        <app-request-game-modal (resultEmitter)="handleGameRequestModal()">
+        </app-request-game-modal>
+    }
+    @if(!isRequestModalOpen && isRequestConfirmation)
+    {
+        <app-request-confirmation [requestUser]="userGame" 
+            [isChallenging]="false" 
+            (emitIsConfirm)="handleRequestConfirmation($event)">
+        </app-request-confirmation>
+    }
+}

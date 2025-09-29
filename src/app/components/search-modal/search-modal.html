@@ -1,0 +1,10 @@
+<div class="container">
+    @for(user of userList; track user)
+    {
+        <div class="content">{{user}}</div>    
+    }
+    @empty
+    {
+        <h4>No result</h4>
+    }
+</div>

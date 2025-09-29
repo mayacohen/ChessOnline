@@ -1,0 +1,67 @@
+.chatList {
+    overflow-y: scroll;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    transition: background 0.25s ease;
+    cursor: pointer;
+
+  // row hover effect
+  &:hover {
+    background: #f1f5f9; // light slate/gray background
+  }
+
+  // username styling
+  span:last-child {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1e293b; // slate-800
+    transition: color 0.2s ease;
+  }
+
+  // clickable username hover
+  &:hover span:last-child {
+    color: #0ea5e9; // sky-500
+  }
+}
+
+// Status dots
+.green-class {
+  color: #22c55e; // green-500
+  font-size: 1rem;
+}
+
+.red-class {
+  color: #ef4444; // red-500
+  font-size: 1rem;
+}
+
+// Search input
+input[type="text"] {
+  width: 100%;
+  margin: 0.75rem 0 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d5d8db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #f8fafc; // light background
+  width: fit-content;
+
+  &:focus {
+    outline: none;
+    border-color: #38bdf8; // sky-400
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    background: #ffffff;
+  }
+}
+
+// Empty state
+h3 {
+  margin: 1rem 0;
+  text-align: center;
+  color: #6b7280; // gray-500
+  font-weight: 500;
+}

@@ -1,0 +1,27 @@
+<div class="modal" #modal (click)="closeModal($event)">
+    <div class="modal-content-chat">
+        <button class="closeButtonChat" #closeButton (click)="closeModal($event)">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="user-messaging">
+            <h3>{{userChat.username}}</h3>
+            <img [src]='userChat.userImg'/>
+        </div>
+        <div class="messageContainer">
+            @for(message of messages; track message)
+            {
+                <div class="message" 
+                [ngClass]="message.recieverUserName !== userName? 'sent-messages' : 
+                'recieved-messages'">{{message.content}}
+                <p>{{message.date}}</p>
+                </div>
+            }
+        </div>
+        <div class="send-new-message-container">
+            <input type="text" placeholder="Message" [(ngModel)]="newMessageContent" (keydown.enter)="sendMessage()"/>
+            <button class="sendButton" (click)="sendMessage()">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>

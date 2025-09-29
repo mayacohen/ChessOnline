@@ -1,0 +1,11 @@
+.container
+{
+    // change to grid 1 small col, two stacking rows
+    display: flex; 
+    flex-direction: row;
+    img
+    {
+        height: 40px;
+        width: 40px;
+    }
+}

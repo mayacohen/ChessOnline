@@ -1,0 +1,125 @@
+/* You can add global styles to this file, and also import other style files */
+body, html
+{
+    margin: 0;
+    padding: 0;
+    font-family: 'Almendra', serif;
+}
+button:hover
+{
+    cursor: pointer;
+}
+.modal
+{
+    background: rgba(30, 30, 30, 0.55);
+    backdrop-filter: blur(4px);    
+    position: absolute;
+    z-index: 100;
+    top:0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@mixin modal-content-base
+{
+    overflow: hidden;
+    position: relative;
+}
+.modal-content
+{
+    @include modal-content-base;
+    height: 400px;
+    width: 400px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    padding: 20px;
+}
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+}
+.fancy-text {
+  background: linear-gradient(
+    to left,
+    oklch(65% 0.15 250), /* medium blue */
+    color-mix(in oklch, oklch(65% 0.15 250), oklch(80% 0.1 200) 50%), /* blue → turquoise */
+    oklch(80% 0.1 200),  /* turquoise */
+    oklch(85% 0.05 240)  /* light blue */
+  );
+  background-clip: text;
+  -webkit-background-clip: text; /* Safari */
+  color: transparent;
+  background-size: 200% 100%;
+  background-position: 100% 0%;
+  transition: background-position 1.8s ease-out;
+}
+
+.fancy-text:hover {
+  background: linear-gradient(
+    to left,
+    oklch(65% 0.15 250),  /* medium blue */
+    oklch(80% 0.1 200),   /* turquoise */
+    oklch(85% 0.05 240),  /* light blue */
+    color-mix(in oklch, oklch(85% 0.05 240), oklch(70% 0.18 60) 40%), /* mix to orange */
+    oklch(70% 0.18 60)    /* orange */
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+  background-position: 0% 0%;
+}
+:root
+{
+    --width-navbar: 100px;
+    --width-shrink-navbar: 400px;
+}
+.form-button
+{
+    width: fit-content;
+    display: flex;
+    align-self: center;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+.almendra-regular {
+  font-family: "Almendra", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.almendra-bold {
+  font-family: "Almendra", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.almendra-regular-italic {
+  font-family: "Almendra", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.almendra-bold-italic {
+  font-family: "Almendra", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+text-danger
+{
+  color: rgba(255, 0, 0, 0.701);
+  font-weight: 700;
+}

@@ -1,0 +1,46 @@
+:host
+{
+    height: 100%;
+    width: var(--width-navbar);
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding-left: 5px;
+}
+.navbar-item, button
+{
+    border: 1px solid black;
+    font-size: 16px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: 5px;
+    display: flex;
+    place-content: center;
+    img
+    {
+        height: 40px;
+        width: 30px;
+    }
+}
+.search-container, .navbar-item, button
+{
+    margin-top: 20px;
+}
+.search-container, input
+{
+    width: 100%;
+    box-sizing: border-box;
+}
+button:hover, .navbar-item:hover
+{
+    cursor: pointer;
+}
+
+@media screen and (max-width:var(--width-shrink-navbar)){
+    :host
+    {
+        height: 70px;
+        width: 100%;
+        flex-direction: row; //hamburger menu
+    }    
+}

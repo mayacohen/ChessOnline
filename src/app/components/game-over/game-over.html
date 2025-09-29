@@ -1,0 +1,18 @@
+<div class="modal" (click)="closeModal()">
+    <div class="modal-content">
+        <button class="close-btn">&times;</button>
+        @if(gameOverType==="Win")
+        {
+            <div class="fancy-text">You won against {{opponentUserName}}</div>
+        }
+        @if(gameOverType==="Lose")
+        {
+            <div class="fancy-text">You lost to {{opponentUserName}}</div>
+        }
+        @if(gameOverType==="Draw")
+        {
+            <div class="fancy-text">It's a draw between you and {{opponentUserName}}</div>
+        }
+        <img src="cuteRook.png" alt="cute pink rook smiling">
+    </div>
+</div>

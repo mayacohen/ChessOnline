@@ -1,0 +1,71 @@
+import { Component, Input, OnInit, Output, EventEmitter,
+  ViewChild, ElementRef, ChangeDetectorRef} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Client } from '../../services/client';
+import { FormsModule } from '@angular/forms';
+import { LoggedInUserModel } from '../../models/logged-in-user-model';
+import { ClientMessageModel } from '../../models/client-message-model';
+import { WebsocketService } from '../../services/websocket-service';
+@Component({
+  selector: 'app-chat',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './chat.html',
+  styleUrl: './chat.scss'
+})
+export class Chat implements OnInit{
+  @ViewChild("modal") modalElement!: ElementRef;
+  @ViewChild("closeButton") closeButton!: ElementRef;
+  @Input() userChat: LoggedInUserModel = {username : '', 
+    userImg: 'example.png', id:'', score:0}; 
+  messages:ClientMessageModel[] =[]; //do websocket implemantation
+  userName:string = '';
+  newMessageContent = '';
+  @Output() closeChatModal = new EventEmitter<void>();
+  constructor(private client:Client, private cdr: ChangeDetectorRef, 
+    private websocketService: WebsocketService){}
+  ngOnInit(): void {
+    this.userName = this.client.getUserName();
+    this.client.getConversationWithParter(this.userChat.username).subscribe({
+      next: res => {
+        this.messages = res.messages;
+        this.cdr.detectChanges();
+      },
+      error: err => console.log(err) 
+    });
+    this.websocketService.sendMessage("fffff");
+    this.websocketService.getMessages().subscribe({ //also on main
+      next: m => console.log(m),
+      error: err => console.log(err)
+    });
+    //do something with websockets probably
+  }
+  closeModal(event:Event)
+  {
+    if (event.target === this.modalElement.nativeElement || 
+      event.target === this.closeButton.nativeElement)
+      this.closeChatModal.emit();
+  }
+  unexpectedEventsHandler(event:Event)
+  {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  sendMessage()
+  {
+    if (this.newMessageContent != '')
+    {
+      const message: ClientMessageModel = {
+        content : this.newMessageContent,
+        recieverUserName : this.userChat.username, 
+        date :  null
+      }; 
+      this.client.sendMessageToUser(message).subscribe({
+        next: (() =>{
+          message.date = new Date().toISOString();
+          this.messages.push(message);
+        }),
+        error: err => console.log(err)
+      });
+    }
+  }
+}

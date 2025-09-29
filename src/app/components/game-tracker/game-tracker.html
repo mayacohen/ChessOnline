@@ -1,0 +1,16 @@
+<h3>Game Tracker</h3>
+@for(lineMove of Moves; track lineMove; let i = $index)
+{
+    <div class="tracking-row">
+    <p>{{i}}</p>
+        @for (individualMove of lineMove; track individualMove)
+        {
+            <p>{{individualMove}}</p>
+        }
+    </div>
+}
+@empty
+{
+    <p>Starting Position</p>
+}
+
