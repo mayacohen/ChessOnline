@@ -1,0 +1,31 @@
+<div class="modal" (click)="closeModal()">
+    <div class="modal-content" (click)="unexpectedEventsHandler($event)">
+        <button class="close-btn" (click)="closeModal()">
+            &times;
+        </button>
+        <div>{{user.username}}</div>
+        <div class="layout">
+            <img [src]="user.userPic">
+            <div class="fancy-text">Score: {{user.score}}</div>
+            <div>
+                @if(isLogged)
+                {
+                    <i [ngClass]="userStatus"></i>
+                }
+            </div>
+            <div class="fancy-text">Date Joined: {{user.dateJoined}}</div>
+            <div>
+                @if(isLogged)
+                {
+                    <button class="fancy-text">Chat!</button>
+                }
+            </div>
+            <div>
+                @if(isLogged && user.isOnline)
+                {
+                    <button class="fancy-text">Request game!</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

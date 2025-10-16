@@ -1,0 +1,10 @@
+.layout
+{
+    display: grid;
+    grid-template-rows: repeat(2,auto);
+    grid-template-columns: 2fr 1fr 1fr;
+}
+i
+{
+    font-size: 3rem;
+}

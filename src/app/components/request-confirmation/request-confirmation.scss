@@ -2,8 +2,9 @@
 
 .rq-content
 {
-    height: 80px;
+    height: fit-content;
     width: 200px;
+    padding: 4px;
     background-color: white;
     display: flex;
     flex-direction: column;
@@ -13,6 +14,10 @@
     div
     {
         white-space: wrap;
+    }
+    > * 
+    {
+        padding: 2px 0;   
     }
 }
 .centered
@@ -32,4 +37,8 @@ button
 {
     border: 1px solid black;
     border-radius: 5px;
+}
+input
+{
+    width: 70px;
 }

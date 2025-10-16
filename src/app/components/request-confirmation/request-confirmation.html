@@ -1,6 +1,11 @@
 <div class="modal">
     <div class="rq-content">
         <div class="centered">{{displayedText}}</div>
+        @if(isChallenging)
+        {
+            <div>Please choose the game time limit (min.)</div>
+            <input type="number" [(ngModel)]="timer" min="5" max="120" step="5">
+        }
         <div class="organize-buttons">
             <button class="fancy-text" (click)='onConfirm()'>{{acceptOrConfirm}}</button>
             <button class="fancy-text" (click)='onCancel()'>{{cancelOrReject}}</button>

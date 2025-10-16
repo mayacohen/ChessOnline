@@ -1,7 +1,10 @@
 <app-navbar></app-navbar>
 @if(isPlaying)
 {
-    <app-board [isWhitePlayer]="isWhitePlayer"></app-board>
+    <app-board 
+    [isWhitePlayer]="isWhitePlayer"
+    [gameTimer]="timer"
+    ></app-board>
 }
 @else
 {
@@ -20,6 +23,7 @@
     @if(!isRequestModalOpen && isRequestConfirmation)
     {
         <app-request-confirmation [requestUser]="userGame" 
+            [timer]="timer"
             [isChallenging]="false" 
             (emitIsConfirm)="handleRequestConfirmation($event)">
         </app-request-confirmation>

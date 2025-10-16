@@ -1,12 +1,3 @@
-:host
-{
-    height: 100%;
-    width: var(--width-navbar);
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    padding-left: 5px;
-}
 .navbar-item, button
 {
     border: 1px solid black;
@@ -16,11 +7,16 @@
     border-radius: 5px;
     display: flex;
     place-content: center;
-    img
-    {
-        height: 40px;
-        width: 30px;
-    }
+}
+.logo
+{
+    height: 100px;
+    width: 100px;
+}
+.small-pic
+{
+    height: 20px;
+    width: 30px;
 }
 .search-container, .navbar-item, button
 {
@@ -35,12 +31,43 @@ button:hover, .navbar-item:hover
 {
     cursor: pointer;
 }
-
-@media screen and (max-width:var(--width-shrink-navbar)){
-    :host
+.big-layout
+{
+    display: none;
+}
+.small-layout
+{
+    height: 70px;
+    width: 100%;
+    display: flex; 
+    align-items: center;
+}
+.default-small
+{
+    justify-content: space-between;
+    padding: 0 10px;
+    width: 100%;
+    display: flex;
+}
+// var(--width-shrink-navbar)
+@media screen and (min-width:660px){
+    .small-layout
     {
-        height: 70px;
-        width: 100%;
-        flex-direction: row; //hamburger menu
-    }    
+        display: none;
+    }
+    .big-layout
+    {
+        height: 100%;
+        width: var(--width-navbar);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        padding-left: 5px;
+        button, div, input
+        {
+            width: 100%;
+            height: 25px;
+        } 
+    }
 }

@@ -10,6 +10,7 @@ import { ClientConversationModel } from '../models/client-conversation-model';
 import { ClientServerMessage } from '../models/client-server-message';
 import { LoggedDTO } from '../models/logged-dto';
 import { StringReturn } from '../models/string-return';
+import { LoggedUserReturnModel } from '../models/logged-user-return-model';
 @Injectable({
   providedIn: 'root'
 })
@@ -38,6 +39,9 @@ export class Client {
   };   
   public newServerGameData : BehaviorSubject<ClientServerMessage>
   = new BehaviorSubject<ClientServerMessage>(this.defaultCSM);
+  public newTrackingMove : Subject<string>
+  = new Subject<string>;
+  public rejectedResponseUser : Subject<string> = new Subject<string>;
   getUserName()
   {
     return this.userName;
@@ -89,9 +93,9 @@ export class Client {
   {
     return this.http.get<string[]>(this.serverUrl+"Players");
   }
-  public sendGameRequest(userName :string):Observable<boolean>
+  public sendGameRequest(userName :string, timer:number):Observable<boolean>
   {
-    return this.http.post<boolean>(this.serverUrl+"GameRequest/"+userName,null);
+    return this.http.post<boolean>(this.serverUrl+"GameRequest/"+userName,timer);
   }
   public handleGameRequestResponse(m: ClientServerMessage) : Observable<void>
   {
@@ -109,7 +113,20 @@ export class Client {
   {
     return this.http.put<void>(this.serverUrl+"Retry",m);
   }
-  //retry
-  // get and send user details,
-  // chess communication in chess logic?
+  public withdrawGame(m:ClientServerMessage): Observable<void>
+  {
+    return this.http.put<void>(this.serverUrl+"Withdraw",m);
+  }
+  public getLoggedUserDetails(userName:string):Observable<LoggedUserReturnModel>
+  {
+    return this.http.get<LoggedUserReturnModel>(this.serverUrl+"LoggedUser"+userName);
+  }
+  public addFriend(friendUserName:string):Observable<void>
+  {
+    return this.http.post<void>(this.serverUrl+"Friend/"+friendUserName, null); 
+  }
+  public removeFriend(friendUserName:string):Observable<void>
+  {
+    return this.http.delete<void>(this.serverUrl+"Friend/"+friendUserName); 
+  }
 }

@@ -16,6 +16,7 @@ import { Client } from '../../services/client';
   styleUrl: './navbar.scss'
 })
 export class Navbar implements OnInit{
+  isHamburgerMenuOpen = false;
   isSearchModalOpen = false;
   isSignupModalOpen = false;
   isLoginModalOpen = false;
@@ -116,6 +117,23 @@ export class Navbar implements OnInit{
     {
       this.userList = [];
       this.isSearchModalOpen = false;
+    }
+  }
+  changeBGColor()
+  {
+    const currBGColor = document.body.style.backgroundColor;
+    //add breakpoint here
+    if (currBGColor === 'var(--color-dark-bg)')
+    {
+      document.body.style.backgroundColor = 'var(--color-light-bg)';
+      document.body.style.color = 'var(--color-light-font)';
+      this.currentUI = this.lightUI;
+    }
+    else
+    {
+      document.body.style.backgroundColor = 'var(--color-dark-bg)';
+      document.body.style.color = 'var(--color-dark-font)';
+      this.currentUI = this.darkUI;
     }
   }
 }

@@ -9,9 +9,13 @@ h3
     display: flex;
     justify-self: center;
 }
-.tracking-row
+.tracking-row, .reverse-row-direction
 {
     display: flex;
-    justify-content: space-between;
     height: fit-content;
+    justify-content: space-between;
+}
+.reverse-row-direction
+{
+    width: calc(100% - 65px);
 }

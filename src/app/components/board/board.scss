@@ -1,8 +1,14 @@
 .layout
 {
     display: flex;
-    flex-direction: row;
     margin: 10px;
+    flex-direction: column;
+}
+@media only screen and (min-width: 740px) {
+    .layout
+    {
+        flex-direction: row;
+    } 
 }
 .container
 {
@@ -17,32 +23,62 @@
     width: 400px;
     height: 400px;
     position: relative;
-    .row-indices, .col-indices
-    {
+    // .row-indices, .col-indices
+    // {
+    //     display: grid;
+    //     position: absolute;
+    //     z-index: 1;
+    //     color: chartreuse;
+    //     background: transparent;
+    // }
+    // .row-indices
+    // {
+    //     grid-template-columns: repeat(8,auto);
+    //     grid-template-rows: 1;
+    //     max-width: 100%;
+    //     top: calc(100% - 30px);
+    //     left: 0;
+    //     width: 100%;
+    //     height: 20px;
+    //     padding: 0 4px;
+    // }
+    // .col-indices
+    // {
+    //     grid-template-columns: 1;
+    //     grid-template-rows: repeat(8,auto);
+    //     top: 0;
+    //     left: 3px;
+    //     height: 100%;
+    //     width: 20px;
+    // }
+    .row-indices, .col-indices {
+        display: grid;
         position: absolute;
-        z-index: 20;
-        display: flex;
+        z-index: 1;
         color: chartreuse;
         background: transparent;
-        align-items: center;
-        justify-content: space-evenly;
-    }
-    .row-indices
-    {
-        max-width: 100%;
-        top: 3px;
+        pointer-events: none;
         left: 0;
+        text-align: center;
+    }
+    .row-indices {
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: 1fr;
         width: 100%;
         height: 20px;
-        padding: 0 4px;
     }
-    .col-indices
-    {
-        flex-direction: column;
-        top: 0;
-        left: 3px;
+    .col-indices {
+        grid-template-rows: repeat(8, 1fr);
+        grid-template-columns: 1fr;
         height: 100%;
         width: 20px;
+        top: 0;
+    }
+    .row-indices > div,
+    .col-indices > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 .board

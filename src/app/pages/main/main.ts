@@ -8,6 +8,7 @@ import { WebsocketService } from '../../services/websocket-service';
 import { timeInterval } from 'rxjs';
 import { ClientServerMessage } from '../../models/client-server-message';
 import { RequestConfirmation } from '../../components/request-confirmation/request-confirmation';
+import { RequestConfirmationReturnValue } from '../../models/request-confirmation-return-value';
 @Component({
   selector: 'app-main',
   imports: [Navbar, Board, CommonModule, RequestGameModal,
@@ -25,6 +26,7 @@ export class Main implements OnInit, OnDestroy{
   message: ClientServerMessage | null = null;
   isWhitePlayer = true; 
   userGame = "";
+  timer = 0; //reset at end of game;
   constructor (private client:Client, private ws: WebsocketService,
     private cdr:ChangeDetectorRef){}
   ngOnInit(): void {
@@ -59,11 +61,20 @@ export class Main implements OnInit, OnDestroy{
   }
   gameResponseHandler(message:ClientServerMessage)
   {
+    //if game response = false?
+    if (message.content === 'false')
+    {
+      this.client.rejectedResponseUser.next(message.senderUserName?? '');
+      this.isSendingOrGettingRequest = false;
+      return;
+    }
     if (this.isPlaying)
     {
       console.log("error"); 
       return
     }
+    if (message.content !== null)
+      this.timer = parseInt(message.content);
     this.isPlaying = true;
     this.isSendingOrGettingRequest = false;
     this.cdr.detectChanges();
@@ -94,6 +105,8 @@ export class Main implements OnInit, OnDestroy{
       } //I don't want users to recieve more then one inventation at the same time
     this.isSendingOrGettingRequest = true;  
     this.message = message;
+    if (message.content !== null)
+      this.timer= parseInt(message.content);
     this.client.setUserName(message.receiverUserName?? "bug");
     this.userGame = message.senderUserName;
     this.client.isGameRequestPopUp.next(true);
@@ -119,15 +132,15 @@ export class Main implements OnInit, OnDestroy{
   { 
     this.isRequestModalOpen = false;
   }
-  handleRequestConfirmation(retValue: boolean)
+  handleRequestConfirmation(retValue: RequestConfirmationReturnValue)
   {
     this.isRequestConfirmation = false;
     if (this.message != null)
     {
       var m !: ClientServerMessage;
-      if (retValue && this.isSendingOrGettingRequest)
+      if (retValue.isAccepting && this.isSendingOrGettingRequest)
       {
-        m = this.setUpReturnModel(this.message, "accept");
+        m = this.setUpReturnModel(this.message, this.timer.toString());
         this.isPlaying = true;
         this.isWhitePlayer = false;
         this.isSendingOrGettingRequest = false;
@@ -141,7 +154,7 @@ export class Main implements OnInit, OnDestroy{
         error: err => {
           this.isPlaying = false;
           this.cdr.detectChanges();
-          //write message to user about gme failing to load or something
+          //write message to user about game failing to load or something
         } 
       });
     }

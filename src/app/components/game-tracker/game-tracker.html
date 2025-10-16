@@ -2,11 +2,13 @@
 @for(lineMove of Moves; track lineMove; let i = $index)
 {
     <div class="tracking-row">
-    <p>{{i}}</p>
-        @for (individualMove of lineMove; track individualMove)
-        {
-            <p>{{individualMove}}</p>
-        }
+        <p>{{i}}</p>
+        <div class="reverse-row-direction">
+            @for (individualMove of lineMove; track individualMove)
+            {
+                <p>{{individualMove}}</p>
+            }
+        </div>
     </div>
 }
 @empty

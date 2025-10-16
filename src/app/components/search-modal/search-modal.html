@@ -1,10 +1,16 @@
-<div class="container">
-    @for(user of userList; track user)
-    {
-        <div class="content">{{user}}</div>    
-    }
-    @empty
-    {
-        <h4>No result</h4>
-    }
-</div>
+@if (isUserView)
+{
+    <app-user-view [user]="user"></app-user-view>
+}
+@else {
+    <div class="container">
+        @for(user of userList; track user)
+        {
+            <div class="content">{{user}}</div>    
+        }
+        @empty
+        {
+            <h4>No result</h4>
+        }
+    </div>
+}

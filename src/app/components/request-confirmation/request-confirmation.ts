@@ -1,18 +1,22 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Client } from '../../services/client';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RequestConfirmationReturnValue } from '../../models/request-confirmation-return-value';
 @Component({
   selector: 'app-request-confirmation',
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './request-confirmation.html',
   styleUrl: './request-confirmation.scss'
 })
 export class RequestConfirmation implements OnInit{
   @Input() requestUser: string =''; 
-  @Output() emitIsConfirm = new EventEmitter<boolean>();
+  @Output() emitIsConfirm = new EventEmitter<RequestConfirmationReturnValue>();
   @Input() isChallenging : boolean = true; 
   acceptOrConfirm = "Accept";
   cancelOrReject = "Reject";
   displayedText = "";
+  @Input() timer : number = 30;
   constructor (private client:Client){}
   ngOnInit(): void {
     this.client.gameOpponent = this.requestUser;
@@ -25,14 +29,14 @@ export class RequestConfirmation implements OnInit{
     }
     else
       this.displayedText = "You were challenged by " + this.requestUser
-    + " to a game of chess. Do You accept?"
+    + " to a game of chess with a time limit of "+this.timer +" min. Do You accept?"
   }
   onCancel()
   {
-    this.emitIsConfirm.emit(false);
+    return this.emitIsConfirm.emit({isAccepting: false, timer: this.isChallenging? this.timer : null});
   }
   onConfirm()
   {
-     this.emitIsConfirm.emit(true);
+    return this.emitIsConfirm.emit({isAccepting: true, timer: this.isChallenging? this.timer : null});
   }
 }

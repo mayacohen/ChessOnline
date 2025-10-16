@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Gamelogic } from '../../services/gamelogic';
+import { Client } from '../../services/client';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-game-tracker',
@@ -9,14 +9,17 @@ import { CommonModule } from '@angular/common';
 })
 export class GameTracker implements OnInit{
   Moves:string[][] = [];
-  constructor(private gamelogic: Gamelogic){}
+  constructor(private client:Client ){}
   ngOnInit(): void {
     this.Moves[0] = [];
-    this.Moves[0].push("F4");
-    this.Moves[0].push("D5");
-    this.Moves[1] = [];
-    this.Moves[1].push("Nc3");
-    this.Moves[1].push('Bf5');
+    this.client.newTrackingMove.subscribe({
+      next: move => {
+        if (this.Moves[this.Moves.length-1].length >= 2)
+          this.Moves.push([]);
+        this.Moves[this.Moves.length-1].push(move);   
+      },
+      error: err => console.log(err)  
+    });
   }
 
 }

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input,
-  ChangeDetectorRef
- } from '@angular/core';
+  ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameTracker } from '../game-tracker/game-tracker';
 import { Gamelogic, Utility, Position } from '../../services/gamelogic';
@@ -10,15 +9,20 @@ import { ClientServerMessage } from '../../models/client-server-message';
 import { GameOver } from '../game-over/game-over';
 import { Promotion } from '../promotion/promotion';
 import { StringReturn } from '../../models/string-return';
+import { format, addMinutes } from 'date-fns' 
+import { timeInterval } from 'rxjs';
+import { sq } from 'date-fns/locale';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, GameTracker, /*PlayerD7etailsForGame,*/ GameOver, Promotion],
+  imports: [CommonModule, GameTracker, /*PlayerDetailsForGame,*/ GameOver, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class Board implements OnInit, AfterViewInit{
   @Input() opponentUserName = ''; 
+  @Input() gameTimer = 0;
+  currentGameTime = -1;
   isGameOver = false;
   isGameOverAndMessage = false;
   isPromotionWindowOpen = false;
@@ -29,7 +33,9 @@ export class Board implements OnInit, AfterViewInit{
   @Input() isWhitePlayer : boolean = true;
   isWhiteTurn = true; 
   rowIndices = ['A','B','C','D','E','F','G','H'];
-  colIndices = ['1','2','3','4','5','6','7','8'];
+  colIndicesReverse = ['1','2','3','4','5','6','7','8'];
+  colIndices= this.colIndicesReverse.reverse();
+  remainingTime = this.gameTimer;
   currentPickedSquare: string | null = null;
   constructor(private client:Client, private gamelogic:Gamelogic,
     private cdr: ChangeDetectorRef){}
@@ -79,6 +85,7 @@ export class Board implements OnInit, AfterViewInit{
   }
   doMoveHTML(ids:string)
   {
+    this.client.newTrackingMove.next(ids);
     const elem1 = document.getElementById(ids.substring(0,2));
     const elem2 = document.getElementById(ids.substring(2,4));
     if (elem1 != null && elem2 != null)
@@ -95,6 +102,8 @@ export class Board implements OnInit, AfterViewInit{
           console.log('bug');
           return;
         }
+        if (pawnRemove.children[0].id.includes('w') === this.isWhitePlayer)
+          this.setAsDragTarget(pawnRemove);
         pawnRemove.removeChild(pawnRemove.children[0]);
       }
       if (elem1.children.length > 0 && 
@@ -111,7 +120,7 @@ export class Board implements OnInit, AfterViewInit{
       this.moveElement(ids.substring(0,2), ids.substring(2,4));
     }
   }
-  moveElement(idStart:string, idEnd:string)
+  moveElement(idStart:string, idEnd:string) //ask chatgpt to streamline?
   {
     const startSq = document.getElementById(idStart);
     const endSq = document.getElementById(idEnd);
@@ -122,11 +131,30 @@ export class Board implements OnInit, AfterViewInit{
       console.log('bug');
       return;
     }
+    if (this.isWhitePlayer === startSq.children[0].id.includes('w'))
+    {
+      this.setAsDragTarget(startSq);
+      this.removeAsDragTarget(endSq);
+    }
+    else if (endSq.children.length > 0 && endSq.children[0].id.includes('w') === this.isWhitePlayer)
+      this.setAsDragTarget(endSq);
     if (endSq.children.length > 0)
         endSq.removeChild(endSq.children[0]); 
    endSq.appendChild(startSq.children[0]);
   }
   ngAfterViewInit(): void {
+    setInterval(() =>
+      {
+        this.currentGameTime +=1;
+        if (this.currentGameTime >= this.gameTimer)
+        {
+          this.client.withdrawGame(this.returnCSM("Withdraw", "")).subscribe({
+            next: () => this.setGameOver("Withdraw"),
+            error: err => console.log(err)
+          });
+        }
+      }
+    ,60*1000);
     for (let i = 0; i< 8; i++)
     {
       if (i>= 2 && i<6)
@@ -186,13 +214,67 @@ export class Board implements OnInit, AfterViewInit{
           chessPiece.classList.add('whitePiece');
           elemId+='w';
         }
+        if ((i<3 && !this.isWhitePlayer) ||i>=3 && this.isWhitePlayer)
+        {
+          chessPiece.draggable = true;
+          chessPiece.addEventListener('dragstart', (event) => {
+            if (event.dataTransfer !== null)
+              event.dataTransfer.setData('text/plain', parent.id);
+          });
+        }
         parent.className= this.getTileClass(i,j,false);
         parent?.appendChild(chessPiece);
         chessPiece.id = elemId + parent?.id;
         this.listOfElemIds.push(chessPiece.id); 
       }
     }
+    this.setInitialDragTargets();
     this.gamelogic.startNewGame(this.isWhitePlayer);
+  }
+  setInitialDragTargets()
+  {
+    const startRow = this.isWhitePlayer? 0 : 2;
+    const endRow = this.isWhitePlayer? 6 : 8;
+    for (let i = startRow; i< endRow; i++)
+    {
+      for (let j =0; j< 8; j++)
+      {
+        const sqr= document.getElementById(String.fromCharCode(('A'.charCodeAt(0)+j))+(8-i).toString());
+        if (sqr !== null)
+          this.setAsDragTarget(sqr);
+      }
+    }
+  }
+  dragOverHandler(event:DragEvent)
+  {
+    event.preventDefault();
+  }
+  dropHandler(sqr:HTMLElement, event:DragEvent)
+  {
+    event.preventDefault();
+    if (event.dataTransfer !== null)
+    {
+        const dragStartId = event.dataTransfer.getData('text/plain');
+        this.onSquareClick(dragStartId);
+        this.onSquareClick(sqr.id);
+    }
+  }
+  setAsDragTarget(sqr: HTMLElement)
+  {
+    sqr.addEventListener('dragover', (event) => {
+      this.dragOverHandler(event);
+      }
+    );
+    sqr.addEventListener('drop', (event) => {
+      this.dropHandler(sqr, event);
+    });
+  }
+  removeAsDragTarget(sqr: HTMLElement) //in doMove - add && remove (twice fo0r  )
+  {
+    sqr.removeEventListener('dragover', (event) => this.dragOverHandler(event));
+    sqr.removeEventListener('drop', (event) => {
+      this.dropHandler(sqr, event);
+    });
   }
   clearHighLightBoard()
   {
@@ -246,7 +328,6 @@ export class Board implements OnInit, AfterViewInit{
           parentSqr.id), char); 
         this.cdr.detectChanges();
   }
-
   onSquareClick(id:string)
   {
     const square = document.getElementById(id);
@@ -315,6 +396,7 @@ export class Board implements OnInit, AfterViewInit{
   }
   setGameOver(message: string)
   {
+    this.isWhiteTurn = this.isWhitePlayer;
     this.isGameOver = true;
     this.gameOverType = message;
     this.isGameOverAndMessage = true;
