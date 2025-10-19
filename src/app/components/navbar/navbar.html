@@ -3,38 +3,40 @@
         <i class="fa-solid fa-bars" (click)="isHamburgerMenuOpen = !isHamburgerMenuOpen;"></i>
         <img class="small-pic" src="logo.png" alt="chess logo"/>
     </div>
-    @if (isHamburgerMenuOpen)
-    {
-        <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
-        <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
-        <div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
-        <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
-        <div class="search-container">
-            <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>
-            @if(isSearchModalOpen === true)
+    <div class="aligned-column">
+        @if (isHamburgerMenuOpen)
+        {
+            <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
+            <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
+            <div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
+            <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
+            <div class="search-container">
+                <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>
+                @if(isSearchModalOpen === true)
+                {
+                    <app-search-modal [userList]="userList"></app-search-modal>
+                }
+            </div>
+            <div class="navbar-item" (click)="changeBGColor()">{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
+            @if (isSignupModalOpen)
             {
-                <app-search-modal [userList]="userList"></app-search-modal>
+                <app-signup (closeModalEmitter)="closeSignupModal()"></app-signup>
             }
-        </div>
-        <div class="navbar-item" (click)="changeBGColor()">{{currentUI}}<i class="fa-solid fa-circle-half-stroke"></i></div>
-        @if (isSignupModalOpen)
-        {
-            <app-signup (closeModalEmitter)="closeSignupModal()"></app-signup>
+            @if (isLoginModalOpen)
+            {
+                <app-login (closeModalEmitter)="closeLoginModal()"></app-login>
+            }
+            @if(isRequestGameModalOpen)
+            {
+                <app-request-game-modal (resultEmitter)="handleGameRequestModal()">
+                </app-request-game-modal>
+            }
+            @if(isSocialModalOpen)
+            {
+                <app-social (closeSocial)="isSocialModalOpen=false;"></app-social>
+            } 
         }
-        @if (isLoginModalOpen)
-        {
-            <app-login (closeModalEmitter)="closeLoginModal()"></app-login>
-        }
-        @if(isRequestGameModalOpen)
-        {
-            <app-request-game-modal (resultEmitter)="handleGameRequestModal()">
-            </app-request-game-modal>
-        }
-        @if(isSocialModalOpen)
-        {
-            <app-social (closeSocial)="isSocialModalOpen=false;"></app-social>
-        } 
-    }
+    </div>
 </div>
 <div class="big-layout">
     <img class="logo" src="logo.png" alt="chess logo"/>

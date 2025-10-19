@@ -37,10 +37,13 @@ button:hover, .navbar-item:hover
 }
 .small-layout
 {
-    height: 70px;
+    height: var(--height-top-navbar);
     width: 100%;
     display: flex; 
     align-items: center;
+    position: fixed;
+    top:0px;
+    left:0px;
 }
 .default-small
 {
@@ -49,7 +52,16 @@ button:hover, .navbar-item:hover
     width: 100%;
     display: flex;
 }
-// var(--width-shrink-navbar)
+.aligned-column
+{
+    display: flex;
+    flex-direction: column;
+    width: var(--width-left-navbar);
+    position: absolute;
+    top: var(--height-top-navbar);
+    z-index: 20;
+}
+//also in main, can't use global variable
 @media screen and (min-width:660px){
     .small-layout
     {
@@ -57,8 +69,13 @@ button:hover, .navbar-item:hover
     }
     .big-layout
     {
-        height: 100%;
-        width: var(--width-navbar);
+        height: 100vh;
+        max-height: 100vh;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: var(--width-left-navbar);
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;

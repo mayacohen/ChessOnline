@@ -23,34 +23,6 @@
     width: 400px;
     height: 400px;
     position: relative;
-    // .row-indices, .col-indices
-    // {
-    //     display: grid;
-    //     position: absolute;
-    //     z-index: 1;
-    //     color: chartreuse;
-    //     background: transparent;
-    // }
-    // .row-indices
-    // {
-    //     grid-template-columns: repeat(8,auto);
-    //     grid-template-rows: 1;
-    //     max-width: 100%;
-    //     top: calc(100% - 30px);
-    //     left: 0;
-    //     width: 100%;
-    //     height: 20px;
-    //     padding: 0 4px;
-    // }
-    // .col-indices
-    // {
-    //     grid-template-columns: 1;
-    //     grid-template-rows: repeat(8,auto);
-    //     top: 0;
-    //     left: 3px;
-    //     height: 100%;
-    //     width: 20px;
-    // }
     .row-indices, .col-indices {
         display: grid;
         position: absolute;
@@ -66,6 +38,7 @@
         grid-template-rows: 1fr;
         width: 100%;
         height: 20px;
+        top: calc(100% - 25px);
     }
     .col-indices {
         grid-template-rows: repeat(8, 1fr);

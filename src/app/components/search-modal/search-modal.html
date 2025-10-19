@@ -1,12 +1,12 @@
 @if (isUserView)
 {
-    <app-user-view [user]="user"></app-user-view>
+    <app-user-view [user]="user" (closeModalEmitter)="closeUserView()"></app-user-view>
 }
 @else {
     <div class="container">
         @for(user of userList; track user)
         {
-            <div class="content">{{user}}</div>    
+            <div class="content" (click)="openUserView(user)">{{user}}</div>    
         }
         @empty
         {

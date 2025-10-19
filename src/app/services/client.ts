@@ -70,8 +70,7 @@ export class Client {
   }
   public login(login: LoginModel): Observable<LoggedDTO>
   {
-    return this.http.post<LoggedDTO>(this.serverUrl+"Login", login, 
-      { responseType: 'text' as 'json'});
+    return this.http.post<LoggedDTO>(this.serverUrl+"Login", login);
   }
   public search(query:string): Observable<(string | null)[] | null>
   {
@@ -119,7 +118,7 @@ export class Client {
   }
   public getLoggedUserDetails(userName:string):Observable<LoggedUserReturnModel>
   {
-    return this.http.get<LoggedUserReturnModel>(this.serverUrl+"LoggedUser"+userName);
+    return this.http.get<LoggedUserReturnModel>(this.serverUrl+"LoggedUser/"+userName);
   }
   public addFriend(friendUserName:string):Observable<void>
   {

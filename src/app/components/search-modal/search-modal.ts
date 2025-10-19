@@ -16,8 +16,9 @@ export class SearchModal {
     dateJoined:"",userPic:"example.png",username:'guest', score:null}; 
   isUserView = false;
     constructor(private client:Client, private cdr:ChangeDetectorRef){}
-  openUserView(username:string)
+  openUserView(username:string | null)
   {
+    if (username === null) return;
     this.client.getLoggedUserDetails(username).subscribe({
       next: user => {
         this.user = user;
@@ -26,5 +27,10 @@ export class SearchModal {
       },
       error: err => console.log(err)
     });
+  }
+  closeUserView()
+  {
+    this.isUserView=false;
+    this.cdr.detectChanges();
   }
 }

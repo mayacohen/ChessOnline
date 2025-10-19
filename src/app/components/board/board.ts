@@ -218,8 +218,9 @@ export class Board implements OnInit, AfterViewInit{
         {
           chessPiece.draggable = true;
           chessPiece.addEventListener('dragstart', (event) => {
-            if (event.dataTransfer !== null)
-              event.dataTransfer.setData('text/plain', parent.id);
+            const currParElem = chessPiece.parentElement;
+            if (event.dataTransfer !== null && currParElem !== null)
+              event.dataTransfer.setData('text/plain', currParElem.id);
           });
         }
         parent.className= this.getTileClass(i,j,false);
@@ -259,22 +260,21 @@ export class Board implements OnInit, AfterViewInit{
         this.onSquareClick(sqr.id);
     }
   }
-  setAsDragTarget(sqr: HTMLElement)
-  {
-    sqr.addEventListener('dragover', (event) => {
-      this.dragOverHandler(event);
-      }
-    );
-    sqr.addEventListener('drop', (event) => {
-      this.dropHandler(sqr, event);
-    });
+  private dragOverListener = (event: DragEvent) => this.dragOverHandler(event);
+  private dropListeners = new Map<HTMLElement, (event: DragEvent) => void>();
+  setAsDragTarget(sqr: HTMLElement) {
+    sqr.addEventListener('dragover', this.dragOverListener);
+    const dropListener = (event: DragEvent) => this.dropHandler(sqr, event);
+    this.dropListeners.set(sqr, dropListener);
+    sqr.addEventListener('drop', dropListener);
   }
-  removeAsDragTarget(sqr: HTMLElement) //in doMove - add && remove (twice fo0r  )
-  {
-    sqr.removeEventListener('dragover', (event) => this.dragOverHandler(event));
-    sqr.removeEventListener('drop', (event) => {
-      this.dropHandler(sqr, event);
-    });
+  removeAsDragTarget(sqr: HTMLElement) {
+    sqr.removeEventListener('dragover', this.dragOverListener);
+    const dropListener = this.dropListeners.get(sqr);
+    if (dropListener) {
+      sqr.removeEventListener('drop', dropListener);
+      this.dropListeners.delete(sqr);
+    }
   }
   clearHighLightBoard()
   {

@@ -85,8 +85,9 @@ button:hover
 }
 :root
 {
-    --width-navbar: 100px;
-    --width-shrink-navbar: 660px;
+    --width-left-navbar: 105px;
+    --height-top-navbar: 70px;
+    --width-shrink-navbar: 660px; //can't be used in media queries.
     --color-light-bg:white;
     --color-light-font:black;
     --color-dark-bg:rgb(62, 62, 62);

@@ -6,11 +6,21 @@
         <div>{{user.username}}</div>
         <div class="layout">
             <img [src]="user.userPic">
-            <div class="fancy-text">Score: {{user.score}}</div>
+            <div>
+                @if (user.score === null)
+                {
+                    <div class="fancy-text">Score: N/A</div>        
+                }
+                @else 
+                {
+                     <div class="fancy-text">Score: {{user.score}}</div>
+                }
+            </div>
             <div>
                 @if(isLogged)
                 {
-                    <i [ngClass]="userStatus"></i>
+                    <i [ngClass]="userStatus" (click)="changeFriendStatus()"></i>
+                    <i class="bi bi-star"></i>
                 }
             </div>
             <div class="fancy-text">Date Joined: {{user.dateJoined}}</div>
