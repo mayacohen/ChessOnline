@@ -1,5 +1,4 @@
 .chatList {
-    overflow-y: scroll;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -8,8 +7,6 @@
     border-radius: 6px;
     transition: background 0.25s ease;
     cursor: pointer;
-
-  // row hover effect
   &:hover {
     background: #f1f5f9; // light slate/gray background
   }
@@ -33,7 +30,14 @@
   color: #22c55e; // green-500
   font-size: 1rem;
 }
-
+.scroll
+{
+  overflow-y: scroll;
+}
+.no-scroll
+{
+  overflow-y: hidden;
+}
 .red-class {
   color: #ef4444; // red-500
   font-size: 1rem;

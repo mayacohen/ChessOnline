@@ -11,7 +11,7 @@
             @for(message of messages; track message)
             {
                 <div class="message" 
-                [ngClass]="message.recieverUserName !== userName? 'sent-messages' : 
+                [ngClass]="message.receiverUserName !== userName? 'sent-messages' : 
                 'recieved-messages'">{{message.content}}
                 <p>{{message.date}}</p>
                 </div>

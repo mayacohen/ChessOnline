@@ -11,21 +11,24 @@
                 &times;
             </button>
             <div>send messages</div>
-            @for (user of loggedUsers; track user.userName)
-            {
-                <div class="chatList" (click)="openChat(user)">
-                    <span [ngClass]="user.isActive? greenClass : redClass">&bull;</span>
-                    <span>{{user.userName}}</span>
-                    @if (user.score !== null)
-                    {
-                        <span>{{user.score}}</span>
-                    }
-                </div>
-            }
-            @empty
-            {
-                <h3>{{emptyMessage}}</h3>
-            }
+            <div [ngClass]="(loggedUsers == null || loggedUsers.length == 0)?
+            'no-scroll' : 'scroll'">
+                @for (user of loggedUsers; track user.userName)
+                {
+                    <div class="chatList" (click)="openChat(user)">
+                        <span [ngClass]="user.isActive? greenClass : redClass">&bull;</span>
+                        <span>{{user.userName}}</span>
+                        @if (user.score !== null)
+                        {
+                            <span>{{user.score}}</span>
+                        }
+                    </div>
+                }
+                @empty
+                {
+                    <h3>{{emptyMessage}}</h3>
+                }
+            </div>
             <input type="text" placeholder="search for user"/>
         </div>
     </div> 

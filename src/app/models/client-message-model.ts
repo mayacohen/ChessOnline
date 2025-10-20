@@ -1,5 +1,5 @@
 export interface ClientMessageModel {
     content : string; 
-    recieverUserName : string; 
+    receiverUserName : string; 
     date : string | null;
 }

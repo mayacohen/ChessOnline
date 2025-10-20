@@ -9,14 +9,15 @@ export const addTokenInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   const http = inject(HttpClient);
   const accessToken = sessionStorage.getItem("accessToken");
+  let authReq = req;
   if (accessToken) {
-    req = req.clone({
+    authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${accessToken}`
       }
     });
   }
-  return next(req).pipe(
+  return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         const refreshToken = localStorage.getItem("refreshToken");

@@ -32,8 +32,8 @@ export class Chat implements OnInit{
       },
       error: err => console.log(err) 
     });
-    this.websocketService.sendMessage("fffff");
-    this.websocketService.getMessages().subscribe({ //also on main
+    this.websocketService.getMessages().subscribe({ 
+      //also on main - main send here.also open ig. anyway handle
       next: m => console.log(m),
       error: err => console.log(err)
     });
@@ -56,13 +56,14 @@ export class Chat implements OnInit{
     {
       const message: ClientMessageModel = {
         content : this.newMessageContent,
-        recieverUserName : this.userChat.username, 
+        receiverUserName : this.userChat.username, 
         date :  null
       }; 
       this.client.sendMessageToUser(message).subscribe({
         next: (() =>{
           message.date = new Date().toISOString();
           this.messages.push(message);
+          this.cdr.detectChanges();
         }),
         error: err => console.log(err)
       });

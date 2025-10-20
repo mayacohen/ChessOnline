@@ -9,12 +9,12 @@ import { LoggedUserReturnModel } from '../../models/logged-user-return-model';
   styleUrl: './user-view.scss'
 })
 export class UserView implements OnInit{
-  notFriend = "bi bi-star";
-  friend = "bi bi-star-fill";
+  // notFriend = "bi bi-star";
+  // friend = "bi bi-star-fill";
   @Output() closeModalEmitter = new EventEmitter<void>();
   @Input() user: LoggedUserReturnModel = {isFriend:null, isOnline:false, 
     dateJoined:"",userPic:"example.png",username:'guest', score:null}; 
-  userStatus = this.user.isFriend? this.friend : this.notFriend;
+//  userStatus = this.user.isFriend? this.friend : this.notFriend;
   constructor(private client:Client, private cdr:ChangeDetectorRef){}
   isLogged = false;
   ngOnInit(): void {
@@ -42,7 +42,8 @@ export class UserView implements OnInit{
       this.client.removeFriend(this.user.username).subscribe({
         next: () => 
           {
-            this.userStatus = this.notFriend;
+            this.user.isFriend = false;
+       //     this.userStatus = this.notFriend;
             this.cdr.detectChanges(); 
           },
           error: err => console.log(err)
@@ -53,7 +54,8 @@ export class UserView implements OnInit{
       this.client.addFriend(this.user.username).subscribe({
         next: () => 
           {
-            this.userStatus = this.friend;
+            this.user.isFriend = true;
+            // this.userStatus = this.friend;
             this.cdr.detectChanges(); 
           },
           error: err => console.log(err)
