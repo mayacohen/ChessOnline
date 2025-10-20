@@ -7,6 +7,7 @@ import { ActiveUserModel } from '../../models/active-user-model';
   styleUrl: './player-details-for-game.scss'
 })
 export class PlayerDetailsForGame {
-  // @Input() user : ActiveUserModel = {username: 'Guest', userImg: 'example.png'
-  //   , score: null, id: ''}; 
+   @Input() user : ActiveUserModel = {username: 'Guest', userImg: 'example.png'
+     , score: null}; 
+
 }

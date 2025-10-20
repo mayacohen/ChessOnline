@@ -1,9 +1,9 @@
 <div class="layout">
     <div class="board">
         <!-- do something for alt? -->
-        <!-- <app-player-details-for-game 
-            [user] = 'opponent'
-        ></app-player-details-for-game> -->
+         <app-player-details-for-game 
+            [user] = 'blackPlayerDetails'
+        ></app-player-details-for-game>
         <div class="board-and-row-col-indices">
             <div class="container">
                 @for (row of board; track row; let i = $index)
@@ -50,9 +50,9 @@
                 }
             </div>
         </div>
-        <!-- <app-player-details-for-game 
-            [user] = 'player'
-        ></app-player-details-for-game> -->
+         <app-player-details-for-game 
+            [user] = 'whitePlayerDetails'
+        ></app-player-details-for-game>
     </div>
     <app-game-tracker></app-game-tracker>
 </div>

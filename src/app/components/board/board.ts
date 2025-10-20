@@ -12,9 +12,10 @@ import { StringReturn } from '../../models/string-return';
 import { format, addMinutes } from 'date-fns' 
 import { timeInterval } from 'rxjs';
 import { sq } from 'date-fns/locale';
+import { ActiveUserModel } from '../../models/active-user-model';
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, GameTracker, /*PlayerDetailsForGame,*/ GameOver, Promotion],
+  imports: [CommonModule, GameTracker, PlayerDetailsForGame, GameOver, Promotion],
   templateUrl: './board.html',
   styleUrl: './board.scss',
   encapsulation: ViewEncapsulation.None
@@ -30,6 +31,10 @@ export class Board implements OnInit, AfterViewInit{
   gameOverType = '';
   lastOppositionMove = '';
   board: string[][] = [];
+  whitePlayerDetails : ActiveUserModel = {username: 'Guest', userImg: 'example.png'
+       , score: null};
+  blackPlayerDetails : ActiveUserModel = {username: 'Guest', userImg: 'example.png'
+       , score: null};  
   @Input() isWhitePlayer : boolean = true;
   isWhiteTurn = true; 
   rowIndices = ['A','B','C','D','E','F','G','H'];
@@ -45,6 +50,7 @@ export class Board implements OnInit, AfterViewInit{
     //userName, userpic, score
     if (this.opponentUserName === '')
       this.opponentUserName= this.client.gameOpponent;
+    this.setPlayerDetails()
     for (let i = 0; i< 8; i++)
     {
       if (!this.board[i])
@@ -82,6 +88,29 @@ export class Board implements OnInit, AfterViewInit{
       },
       error: err => console.log(err) 
   });
+  }
+  setPlayerDetails()
+  {
+    const thisPlayer : ActiveUserModel = {
+      username : "You: " + this.client.getUserName(),
+      userImg : this.client.getUserPic(),
+      score : null //missing
+    };
+    const opponent : ActiveUserModel = {
+      username : this.opponentUserName,
+      userImg : "example.png", //missing
+      score : null //missing
+    };
+    if (this.isWhitePlayer)
+    {
+      this.whitePlayerDetails = thisPlayer;
+      this.blackPlayerDetails = opponent;
+    }
+    else
+    {
+      this.blackPlayerDetails = thisPlayer;
+      this.whitePlayerDetails = opponent;
+    }
   }
   doMoveHTML(ids:string)
   {
