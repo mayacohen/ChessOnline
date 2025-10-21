@@ -5,10 +5,10 @@ import { CommonModule } from '@angular/common';
 import { RequestGameModal } from '../../components/request-game-modal/request-game-modal';
 import { Client } from '../../services/client';
 import { WebsocketService } from '../../services/websocket-service';
-import { timeInterval } from 'rxjs';
 import { ClientServerMessage } from '../../models/client-server-message';
 import { RequestConfirmation } from '../../components/request-confirmation/request-confirmation';
 import { RequestConfirmationReturnValue } from '../../models/request-confirmation-return-value';
+import { PopupMessageModel } from '../../models/popup-message-model'; 
 @Component({
   selector: 'app-main',
   imports: [Navbar, Board, CommonModule, RequestGameModal,
@@ -40,6 +40,8 @@ export class Main implements OnInit, OnDestroy{
           next: m => 
           {
             console.log(m);
+            if ('type' in m && m.type === 'Chat Request')
+              this.handleNewMessage(m);
             if ('type' in m && m.type === "Game Request")
               this.handleGameRequest(m);
             //Game response, move, chat?
@@ -160,5 +162,17 @@ export class Main implements OnInit, OnDestroy{
     }
     else
       console.log("error");
+  }
+  handleNewMessage(m: PopupMessageModel)
+  {
+    this.client.newMessage.next(m);
+  }
+  gameOver()
+  {
+    this.isPlaying = false;
+    this.isSendingOrGettingRequest = false;
+    this.userGame == "";
+    this.timer = 0;
+    this.message = null;
   }
 }

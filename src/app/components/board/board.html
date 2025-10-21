@@ -15,7 +15,11 @@
                         </div>
                     }
                 }
-                @if (isWhitePlayer !== isWhiteTurn)
+                @if (isGameOver)
+                {
+                    <i id="returnButton"(click)="returnToMain()" class="fa-solid fa-arrow-left"></i>
+                }
+                @if (isWhitePlayer !== isWhiteTurn && !isGameOver)
                 {
                     <div id="hourglassModal">
                         <div>

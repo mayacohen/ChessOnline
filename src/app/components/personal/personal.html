@@ -1,24 +1,67 @@
 <div #modal class="modal" (click)="closeModal($event)">
   <div class="modal-content">
     <button #closeButton class="close-btn" (click)="closeModal($event)">&times;</button>
-    <h3>Username: </h3>
-    <img src="example.png" alt="user avatar">
-     @if(!isGoogleFacebook)
-    {
-            <button class="fancy-text">Change Username</button>
-    } 
-    <div>
-        <p>Email:</p>
-        @if(!isGoogleFacebook)
-        {
-            <button class="fancy-text">Change Email</button>
-        } 
+    <div class="container">
+      <h3>Username: </h3>
+      <img src="example.png" alt="user avatar">
+      @if(!isGoogleFacebook)
+      {
+              <button class="fancy-text">Change username</button>
+      } 
+      <div>
+          <p>Email:</p>
+          @if(!isGoogleFacebook)
+          {
+              <button class="fancy-text">Change email</button>
+          } 
+      </div>
+      <p>Date joined:</p>
+      <button class="fancy-text">Change password</button>
+      <div>Scrore: N/A</div>
+      <div>Games won</div>
+      <div>Games lost</div>
+      <div>Games tied</div>
+      <div>
+        <p>Switch avatar</p>
+        <div class="picture-grid">
+          @if(tempUserPic != 'icon1.png') 
+          {
+            <div (click)='switchAvatar(1)'>
+              <img src="icon1.png" alt="optional avatar num.1">
+            </div>
+          }
+          @if(tempUserPic != 'icon2.png') 
+          {
+            <div (click)='switchAvatar(2)'>
+              <img src="icon2.png" alt="optional avatar num.2">
+            </div>
+          }
+          @if(tempUserPic != 'icon3.png') 
+          {
+            <div (click)='switchAvatar(3)'>
+              <img src="icon3.png" alt="optional avatar num.3">
+            </div>
+          }
+          @if(tempUserPic != 'icon4.png') 
+          {
+            <div (click)='switchAvatar(4)'>
+              <img src="icon4.png" alt="optional avatar num.4">
+            </div>
+          }
+          @if(tempUserPic != 'icon5.png') 
+          {
+            <div (click)='switchAvatar(5)'>
+              <img src="icon5.png" alt="optional avatar num.5">
+          </div>
+          }
+          @if(tempUserPic != 'icon6.png') 
+          {
+            <div (click)='switchAvatar(6)'>
+              <img src="icon6.png" alt="optional avatar num.6">
+            </div>
+          }
+        </div>
+      </div>
     </div>
-    <p>Date joined:</p>
-    <button class="fancy-text">Change Password</button>
-    <div>Scrore: N/A</div>
-    <div>Games Won</div>
-    <div>Games Lost</div>
-    <div>Games Tied</div>
   </div>
 </div>

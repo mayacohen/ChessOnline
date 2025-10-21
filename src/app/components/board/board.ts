@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input,
-  ChangeDetectorRef } from '@angular/core';
+  ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameTracker } from '../game-tracker/game-tracker';
 import { Gamelogic, Utility, Position } from '../../services/gamelogic';
@@ -23,6 +23,7 @@ import { ActiveUserModel } from '../../models/active-user-model';
 export class Board implements OnInit, AfterViewInit{
   @Input() opponentUserName = ''; 
   @Input() gameTimer = 0;
+  @Output() closeBoard = new EventEmitter<void>();
   currentGameTime = -1;
   isGameOver = false;
   isGameOverAndMessage = false;
@@ -96,11 +97,32 @@ export class Board implements OnInit, AfterViewInit{
       userImg : this.client.getUserPic(),
       score : null //missing
     };
-    const opponent : ActiveUserModel = {
+    let opponent: ActiveUserModel = {
       username : this.opponentUserName,
       userImg : "example.png", //missing
       score : null //missing
-    };
+      };
+    if (!this.opponentUserName.startsWith('guest-'))
+    {
+      this.client.getLoggedUserDetails(this.opponentUserName).subscribe({
+        next: user =>
+        {
+          opponent.score = user.score;
+          opponent.userImg = user.userPic; 
+          this.setUsersAsGamePlayers(thisPlayer, opponent);
+        },
+        error : err =>  
+          {
+            console.log(err);
+            this.setUsersAsGamePlayers(thisPlayer, opponent);
+          }
+      });
+    }
+    else
+      this.setUsersAsGamePlayers(thisPlayer, opponent);
+  }
+  setUsersAsGamePlayers(thisPlayer:ActiveUserModel, opponent:ActiveUserModel)
+  {
     if (this.isWhitePlayer)
     {
       this.whitePlayerDetails = thisPlayer;
@@ -111,7 +133,8 @@ export class Board implements OnInit, AfterViewInit{
       this.blackPlayerDetails = thisPlayer;
       this.whitePlayerDetails = opponent;
     }
-  }
+    this.cdr.detectChanges();
+  } 
   doMoveHTML(ids:string)
   {
     this.client.newTrackingMove.next(ids);
@@ -501,5 +524,9 @@ export class Board implements OnInit, AfterViewInit{
       if (elemToHighLight !== null)
         elemToHighLight.className = this.getTileClass(newPos.getRow(), newPos.getCol(),true);
       this.cdr.detectChanges();
+  }
+  returnToMain()
+  {
+    this.closeBoard.emit();
   }
 }

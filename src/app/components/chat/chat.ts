@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { LoggedInUserModel } from '../../models/logged-in-user-model';
 import { ClientMessageModel } from '../../models/client-message-model';
 import { WebsocketService } from '../../services/websocket-service';
+import { PopupMessageModel } from '../../models/popup-message-model';
 @Component({
   selector: 'app-chat',
   imports: [CommonModule, FormsModule],
@@ -32,9 +33,21 @@ export class Chat implements OnInit{
       },
       error: err => console.log(err) 
     });
-    this.websocketService.getMessages().subscribe({ 
+    this.client.newMessage.subscribe({ 
       //also on main - main send here.also open ig. anyway handle
-      next: m => console.log(m),
+      next: m => 
+        {
+          console.log(m)
+          if (m.sender == this.userChat.username)
+          {
+            const message : ClientMessageModel ={
+              content : m.content,
+              receiverUserName : m.receiver,
+              date : m.date
+            }  
+            this.messages.push(message);
+          }
+        },
       error: err => console.log(err)
     });
     //do something with websockets probably

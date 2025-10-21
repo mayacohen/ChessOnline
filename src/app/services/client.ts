@@ -11,6 +11,7 @@ import { ClientServerMessage } from '../models/client-server-message';
 import { LoggedDTO } from '../models/logged-dto';
 import { StringReturn } from '../models/string-return';
 import { LoggedUserReturnModel } from '../models/logged-user-return-model';
+import { PopupMessageModel } from '../models/popup-message-model';
 @Injectable({
   providedIn: 'root'
 })
@@ -42,6 +43,7 @@ export class Client {
   public newTrackingMove : Subject<string>
   = new Subject<string>;
   public rejectedResponseUser : Subject<string> = new Subject<string>;
+  public newMessage: Subject<PopupMessageModel> = new Subject<PopupMessageModel>;
   getUserName()
   {
     return this.userName;
@@ -127,5 +129,9 @@ export class Client {
   public removeFriend(friendUserName:string):Observable<void>
   {
     return this.http.delete<void>(this.serverUrl+"Friend/"+friendUserName); 
+  }
+  public changePicture(newImg : string):Observable<void>
+  {
+    return this.http.patch<void>(this.serverUrl+"Picture",newImg);
   }
 }

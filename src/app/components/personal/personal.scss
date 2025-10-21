@@ -1,0 +1,30 @@
+img
+{
+    height: 60px;
+    width: 60px;
+}
+.picture-grid
+{
+    display: grid;
+    grid-template-rows: repeat(2,70px);
+    grid-template-columns: repeat(2,70px);
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    img
+    {
+        border: 1px solid black;
+        border-radius: 5px;
+    }
+}
+.avatar-section
+{
+    display: flex;
+    align-items: start;
+}
+// .container
+// {
+
+// }
+
+
