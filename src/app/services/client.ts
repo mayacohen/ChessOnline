@@ -12,6 +12,9 @@ import { LoggedDTO } from '../models/logged-dto';
 import { StringReturn } from '../models/string-return';
 import { LoggedUserReturnModel } from '../models/logged-user-return-model';
 import { PopupMessageModel } from '../models/popup-message-model';
+import { EmailChangeModel } from '../models/email-change-model';
+import { UsernameChangeModel } from '../models/username-change-model';
+import { PasswordChangeModel } from '../models/password-change-model';
 @Injectable({
   providedIn: 'root'
 })
@@ -133,5 +136,17 @@ export class Client {
   public changePicture(newImg : string):Observable<void>
   {
     return this.http.patch<void>(this.serverUrl+"Picture",newImg);
+  }
+  public changeUserName(newUserName: UsernameChangeModel):Observable<string>
+  {
+    return this.http.patch<string>(this.serverUrl+"UserName",newUserName);
+  }
+  public changeEmail(newEmail: EmailChangeModel):Observable<void>
+  {
+    return this.http.patch<void>(this.serverUrl+"Email",newEmail);
+  }
+  public changePassword(newPassword: PasswordChangeModel):Observable<void>
+  {
+    return this.http.patch<void>(this.serverUrl+"Password",newPassword);
   }
 }

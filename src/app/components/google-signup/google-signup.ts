@@ -1,12 +1,35 @@
 import { Component } from '@angular/core';
-
+import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
 @Component({
   selector: 'app-google-signup',
-  imports: [],
+  imports: [SocialLoginModule],
+  providers: [
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider('734613086299-cpet8k8rj72hitk4a5lmtur2o85i905i.apps.googleusercontent.com')
+          }
+        ]
+      } as SocialAuthServiceConfig,
+    },
+  ],
   templateUrl: './google-signup.html',
   styleUrl: './google-signup.scss'
 })
 export class GoogleSignup {
+  constructor(private authService: SocialAuthService) {}
+
+signInWithGoogle(): void {
+  this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(user => {
+    console.log(user);
+    // user.idToken -> send to backend
+  });
+}
   // decodeJWT(token) 
   // {
   //   let base64Url = token.split(".")[1];

@@ -10,7 +10,7 @@
     {
         <app-wait-modal></app-wait-modal>
     }
-    @else
+    @else if  (inputUser === null)
     {
         <div class="modal" (click)="closeModal()">
             <div class="modal-content" (click)="unexpectedEventsHandler($event)">

@@ -46,11 +46,11 @@ export class Chat implements OnInit{
               date : m.date
             }  
             this.messages.push(message);
+            this.cdr.detectChanges();
           }
         },
       error: err => console.log(err)
     });
-    //do something with websockets probably
   }
   closeModal(event:Event)
   {
@@ -76,6 +76,7 @@ export class Chat implements OnInit{
         next: (() =>{
           message.date = new Date().toISOString();
           this.messages.push(message);
+          this.newMessageContent = "";
           this.cdr.detectChanges();
         }),
         error: err => console.log(err)

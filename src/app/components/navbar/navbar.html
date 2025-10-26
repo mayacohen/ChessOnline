@@ -42,7 +42,7 @@
     <img class="logo" src="logo.png" alt="chess logo"/>
     <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
     <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
-    <div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
+    <div class="navbar-item fancy-text" (click)="clickSignUpModal()">Sign Up</div>
     <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
     <div class="search-container">
         <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>

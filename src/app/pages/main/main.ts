@@ -78,6 +78,7 @@ export class Main implements OnInit, OnDestroy{
     if (message.content !== null)
       this.timer = parseInt(message.content);
     this.isPlaying = true;
+    this.isRequestModalOpen = false;
     this.isSendingOrGettingRequest = false;
     this.cdr.detectChanges();
   }

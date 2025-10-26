@@ -2,18 +2,108 @@
   <div class="modal-content">
     <button #closeButton class="close-btn" (click)="closeModal($event)">&times;</button>
     <div class="container">
-      <h3>Username: </h3>
-      <img src="example.png" alt="user avatar">
-      @if(!isGoogleFacebook)
-      {
-              <button class="fancy-text">Change username</button>
-      } 
-      <div>
-          <p>Email:</p>
-          @if(!isGoogleFacebook)
-          {
-              <button class="fancy-text">Change email</button>
-          } 
+      <!--  -->
+        <div class="profile-container">
+          <h2 class="profile-title">Account Settings</h2>
+          <div class="user-info">
+            <h3>Username:</h3>
+            <div class="user-details">
+              <img src="example.png" alt="User Avatar" class="avatar" />
+              @if (!isGoogleFacebook) {
+                <button class="fancy-text" (click)="toggleUsernameForm()">Change username</button>
+              }
+            </div>
+          </div>
+          @if (showUsernameForm) {
+            <form [formGroup]="userNameForm" (ngSubmit)="onChangeUsername()" class="form-section">
+              <input
+                type="text"
+                formControlName="userName"
+                placeholder="Enter new username"
+                class="form-control"
+              />
+              @if (userNameForm.get('userName')?.invalid && userNameForm.get('userName')?.touched) {
+                <div class="error">
+                  @if (userNameForm.get('userName')?.hasError('required')) {
+                    <small>Username is required.</small>
+                  }
+                  @if (userNameForm.get('userName')?.hasError('minlength')) {
+                    <small>Minimum 4 characters.</small>
+                  }
+                  @if (userNameForm.get('userName')?.hasError('startsWithGuest')) {
+                    <small>Cannot start with "Guest" or "guest".</small>
+                  }
+                </div>
+              }
+              <button type="submit" class="btn btn-primary" [disabled]="userNameForm.invalid">
+                Save Username
+              </button>
+            </form>
+          }
+          <div class="email-section">
+            <h3>Email:</h3>
+            @if (!isGoogleFacebook) {
+              <button class="fancy-text" (click)="toggleEmailForm()">Change email</button>
+            }
+          </div>
+          @if (showEmailForm) {
+            <form [formGroup]="emailForm" (ngSubmit)="onChangeEmail()" class="form-section">
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="Enter new email"
+                class="form-control"
+              />
+              @if (isEmailTaken)
+              {
+                <small class="text-danger">
+                        The email you entered is already in use.    
+                </small>
+              }
+              @if (emailForm.get('email')?.invalid && emailForm.get('email')?.touched) {
+                <div class="error">
+                  @if (emailForm.get('email')?.hasError('required')) {
+                    <small>Email is required.</small>
+                  }
+                  @if (emailForm.get('email')?.hasError('email')) {
+                    <small>Enter a valid email address.</small>
+                  }
+                </div>
+              }
+              <button type="submit" class="btn btn-primary" [disabled]="emailForm.invalid">
+                Save Email
+              </button>
+            </form>
+          }
+        <div class="password-section">
+          <button class="fancy-text" (click)="togglePasswordForm()">Change password</button>
+        </div>
+        <!-- CHANGE PASSWORD FORM -->
+        @if (showPasswordForm) {
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="form-section">
+            <input
+              type="password"
+              formControlName="oldPassword"
+              placeholder="Old password"
+              class="form-control"
+            />
+            <input
+              type="password"
+              formControlName="newPassword"
+              placeholder="New password"
+              class="form-control"
+            />
+            @if (passwordForm.errors?.['passwordsAreNotEqual']) {
+              <div class="error">
+                <small>Passwords do not match.</small>
+              </div>
+            }
+
+            <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">
+              Save Password
+            </button>
+          </form>
+        }
       </div>
       <p>Date joined:</p>
       <button class="fancy-text">Change password</button>
@@ -21,7 +111,7 @@
       <div>Games won</div>
       <div>Games lost</div>
       <div>Games tied</div>
-      <div>
+      <div class="avatar-section">
         <p>Switch avatar</p>
         <div class="picture-grid">
           @if(tempUserPic != 'icon1.png') 

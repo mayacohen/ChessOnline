@@ -2,9 +2,12 @@ import { Component, EventEmitter, Input, OnInit , ChangeDetectorRef, Output } fr
 import { Client } from '../../services/client';
 import { CommonModule } from '@angular/common';
 import { LoggedUserReturnModel } from '../../models/logged-user-return-model';
+import { Chat } from '../chat/chat';
+import { LoggedInUserModel } from '../../models/logged-in-user-model';
+import { RequestGameModal } from '../request-game-modal/request-game-modal';
 @Component({
   selector: 'app-user-view',
-  imports: [CommonModule],
+  imports: [CommonModule, Chat, RequestGameModal],
   templateUrl: './user-view.html',
   styleUrl: './user-view.scss'
 })
@@ -15,15 +18,42 @@ export class UserView implements OnInit{
   @Input() user: LoggedUserReturnModel = {isFriend:null, isOnline:false, 
     dateJoined:"",userPic:"example.png",username:'guest', score:null}; 
 //  userStatus = this.user.isFriend? this.friend : this.notFriend;
+    userChat: LoggedInUserModel = {username : '', 
+      userImg: 'example.png', id:'', score:0};
+  isChatModalOpen = false;
+  isRequestModal = false;
   constructor(private client:Client, private cdr:ChangeDetectorRef){}
   isLogged = false;
   ngOnInit(): void {
     if (this.client.getLoggedInStatus())
       this.isLogged = true;
+    this.userChat.username = this.user.username;
+    this.userChat.score = this.user.score?? 0;
+    this.userChat.userImg = this.user.userPic;
+  }
+  closeGameRequestModal()
+  {
+    this.isRequestModal = false;
+  }
+  openRequestModal()
+  {
+    this.isRequestModal = true;
   }
   closeModal()
   {
     this.closeModalEmitter.emit();
+  }
+  closeChatModal()
+  {
+    this.isChatModalOpen = false;
+  }
+  // handleRequestConfirmation($event)
+  // {
+
+  // }
+  openChatModal()
+  {
+    this.isChatModalOpen = true;
   }
   unexpectedEventsHandler(event:Event)
   {
@@ -62,5 +92,5 @@ export class UserView implements OnInit{
       });
     }
   }
-  //to add: chat, request game.
+  //to add: request game.
 }

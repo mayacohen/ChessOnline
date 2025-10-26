@@ -102,7 +102,7 @@ export class Board implements OnInit, AfterViewInit{
       userImg : "example.png", //missing
       score : null //missing
       };
-    if (!this.opponentUserName.startsWith('guest-'))
+    if (!this.opponentUserName.startsWith('Guest-'))
     {
       this.client.getLoggedUserDetails(this.opponentUserName).subscribe({
         next: user =>

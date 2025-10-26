@@ -48,7 +48,8 @@ export class Signup implements OnInit{
   usernameDoesntStartWithGuestValidator(control:AbstractControl)
   {
     const username = control.value;
-    if (username && username instanceof String && username.startsWith("guest-"))
+    if (username && username instanceof String && (username.startsWith("Guest-") || 
+    username.startsWith('guest-')))
       return {illegalUsername: true};
     return null;
   }
@@ -56,9 +57,6 @@ export class Signup implements OnInit{
   {
     const password = control.value.password;
     const confirmPassword = control.value.confirmPassword;
-    //const password = formGroup.get('password')?.value;
-    //const confirmPassword = formGroup.get('confirmPassword')?.value;
-
     if (password && confirmPassword && password !== confirmPassword) {
       return { passwordMismatch: true };
     }
@@ -105,8 +103,8 @@ export class Signup implements OnInit{
       this.closeModalEmitter.emit();
   }
   isIdentityResult(error: any): error is IdentityResult {
-  return error && typeof error.succeeded === "boolean" && Array.isArray(error.errors);
-}
+    return error && typeof error.succeeded === "boolean" && Array.isArray(error.errors);
+  }
  getIdentityErrors(error: any): string[] {
   if (this.isIdentityResult(error)) {
     return error.errors.map(e => e.description);

@@ -1,4 +1,5 @@
-import { Component, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ChangeDetectorRef,
+  Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlayerDetailsForGame } from '../player-details-for-game/player-details-for-game';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,7 @@ import { timeout } from 'rxjs';
 export class RequestGameModal implements OnInit{
   activeUsers: string[] = [];
   searchQuery : string = ''; //not init yet
+  @Input() inputUser : string | null = null;  
   isRequestConfirmation = false;
   userGame: string = '';
   isWaitModalOpen = false;
@@ -24,7 +26,18 @@ export class RequestGameModal implements OnInit{
   emptyMessage = "Loading Users..";
   constructor (private client:Client, private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
-    this.client.getAvailablePlayers().subscribe({
+    if (this.inputUser !== null)
+    {
+      this.userGame = this.inputUser;
+      this.isRequestConfirmation = true;
+      this.client.rejectedResponseUser.subscribe({
+      next: () => this.resultEmitter.emit(),
+      error: err => console.log(err)
+    });
+    }
+    else
+    {
+      this.client.getAvailablePlayers().subscribe({
       next: list => 
         {
           this.activeUsers = list;
@@ -46,6 +59,7 @@ export class RequestGameModal implements OnInit{
       },
       error: err => console.log(err)
     });
+    }
   }
   closeModal()
   {
