@@ -7,6 +7,7 @@ import { FormGroup,FormsModule, FormBuilder,Validators,
 import { EmailChangeModel } from '../../models/email-change-model';
 import { PasswordChangeModel } from '../../models/password-change-model';
 import { UsernameChangeModel } from '../../models/username-change-model';
+import { PersonalDetails } from '../../models/personal-details';
 @Component({
   selector: 'app-personal',
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
@@ -27,10 +28,17 @@ export class Personal implements OnInit{
   showPasswordForm = false;
   isEmailTaken = false;
   isUserNameTaken = false;
+  user : PersonalDetails = {username:"", userPic:"example.pmg", score:null,
+    gamesDraw:0, gamesLost:0, gamesWon:0, dateJoined:"",Email:""};
   constructor(private client:Client, private cdr:ChangeDetectorRef,
     private fb:FormBuilder){}
   ngOnInit(): void {
-    this.tempUserPic = this.client.getUserPic();
+    this.client.getPersonalInfo().subscribe({
+      next: info => {this.user = info;
+        this.cdr.detectChanges();
+      },
+      error : err => console.log(err)
+    });
     this.emailForm = this.fb.group({
       email:['', Validators.required, Validators.email]      
     });
@@ -84,7 +92,7 @@ export class Personal implements OnInit{
       this.client.changePicture(newImg).subscribe({
         next: () => 
           {
-            this.tempUserPic = newImg;
+            this.user.userPic = newImg;
             this.cdr.detectChanges();
           },
         error: err => console.log(err)
@@ -104,7 +112,7 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.isEmailTaken = false;
-        const temp = emailModel.email;
+        this.user.Email = emailModel.email;
         this.showEmailForm= false;
         this.cdr.detectChanges();
       },
@@ -120,7 +128,7 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.isUserNameTaken = false;
-        const temp = usernameModel.userName;
+        this.user.username = usernameModel.userName;
         this.showUsernameForm= false;
         this.cdr.detectChanges();
       },

@@ -1,0 +1,33 @@
+<div class="fake-modal">
+    <div class="fake-modal-content">
+        <i id="returnButton"(click)="exitScreen()" class="fa-solid fa-arrow-left"></i>
+    <div class="league-container">
+        <div class="league-header grid">
+            <div class="col-user">User Name</div>
+            <div class="col-score">Score</div>
+        </div>
+        <div class="col-user user-info">
+            @for (player of leagueResults; track player.userName)
+            {
+                <div 
+                    class="league-row" 
+                    [ngClass]="{'highlight': player.isUser}">
+                    <img 
+                    [src]="player.userPic" 
+                    alt="{{player.userName}}'s picture" 
+                    class="user-pic">
+                    <div class="username">
+                    {{ player.isUser ? ('You (' + player.userName + ')') : player.userName }}
+                    </div>
+                    <div class="score">
+                    {{ player.score}}
+                    </div>
+                </div>
+            }
+            @empty {
+                <h3>Start playing and enter the league!</h3>
+            }
+        </div>
+    </div>
+</div>
+

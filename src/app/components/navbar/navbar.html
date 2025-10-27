@@ -8,8 +8,9 @@
         {
             <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
             <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
-            <div class="navbar-item fancy-text" (click)="isSignupModalOpen = !isSignupModalOpen;">Sign Up</div>
-            <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
+            <div class="navbar-item fancy-text" (click)="clickSignUpModal()">{{signUpOrPersonal}}</div>
+            <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div>
+            <div class="navbar-item fancy-text" (click)="leagueModalOpenClose()">View League</div> 
             <div class="search-container">
                 <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>
                 @if(isSearchModalOpen === true)
@@ -21,6 +22,11 @@
             @if (isSignupModalOpen)
             {
                 <app-signup (closeModalEmitter)="closeSignupModal()"></app-signup>
+            }
+            @if (isPersonalOpen)
+            {
+                <app-personal (closeModalEmitter)="closePersonal()">
+                </app-personal>
             }
             @if (isLoginModalOpen)
             {
@@ -35,6 +41,10 @@
             {
                 <app-social (closeSocial)="isSocialModalOpen=false;"></app-social>
             } 
+            @if (isLeagueOpen) 
+            {
+                <app-league-screen (exit)="closeLeague()"></app-league-screen>
+            }
         }
     </div>
 </div>
@@ -42,8 +52,9 @@
     <img class="logo" src="logo.png" alt="chess logo"/>
     <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
     <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
-    <div class="navbar-item fancy-text" (click)="clickSignUpModal()">Sign Up</div>
+    <div class="navbar-item fancy-text" (click)="clickSignUpModal()">{{signUpOrPersonal}}</div>
     <div class="navbar-item fancy-text" (click)="LogInLogOut()">{{currentLoginMessage}}</div> 
+    <div class="navbar-item fancy-text" (click)="leagueModalOpenClose()">View League</div>
     <div class="search-container">
         <input type="text" placeholder="search.." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"/>
         @if(isSearchModalOpen === true)
@@ -68,6 +79,15 @@
     @if(isSocialModalOpen)
     {
         <app-social (closeSocial)="isSocialModalOpen=false;"></app-social>
+    }
+    @if (isPersonalOpen)
+    {
+        <app-personal (closeModalEmitter)="closePersonal()">
+        </app-personal>
+    }
+    @if (isLeagueOpen) 
+    {
+        <app-league-screen (exit)="closeLeague()"></app-league-screen>
     }
 </div>
 

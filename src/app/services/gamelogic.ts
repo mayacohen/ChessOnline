@@ -695,7 +695,7 @@ class ChessGame
     const toEat = this.getPieceFromBoard(move.getNewPos(), false);
     if (piece instanceof Pawn && move.getColAbs() === 1 &&
     move.getRowAbs() === 1 && toEat === null)
-      this.checkBoard[move.getNewRow()][move.getOldCol()] = null;
+      this.checkBoard[move.getOldRow()][move.getNewCol()] = null;
     if (piece instanceof King && move.getColAbs() === 2)
     {
       if (this.isInCheck())

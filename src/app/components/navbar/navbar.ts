@@ -8,10 +8,12 @@ import { Social } from '../social/social';
 import { LoggedInUserModel } from '../../models/logged-in-user-model';
 import { SearchModal } from '../search-modal/search-modal';
 import { Client } from '../../services/client';
+import { Personal } from '../personal/personal';
+import { LeagueScreen } from '../league-screen/league-screen';
 @Component({
   selector: 'app-navbar',
   imports: [Signup, CommonModule, Login, FormsModule, 
-    RequestGameModal, Social, SearchModal],
+    RequestGameModal, Social, SearchModal, Personal, LeagueScreen],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
@@ -24,6 +26,9 @@ export class Navbar implements OnInit{
   isSocialModalOpen = false;
   loginMessage = "Log In";
   logoutMessage = "Log Out";
+  signUpOrPersonal = "Sign Up";
+  isPersonalOpen = false;
+  isLeagueOpen = false;
   currentLoginMessage = this.loginMessage;
   darkUI = 'Dark UI';
   lightUI = 'Light UI';
@@ -50,6 +55,26 @@ export class Navbar implements OnInit{
         error: err => console.log("hahaha"+err)
     });
   }
+  leagueModalOpenClose()
+  {
+    this.isLeagueOpen = !this.isLeagueOpen;
+    this.cdr.detectChanges();
+  }
+  closeLeague()
+  {
+    this.isLeagueOpen = false;
+  }
+  closePersonal()
+  {
+    this.isPersonalOpen = false;
+  }
+  clickSignUpModal()
+  {
+    if (this.signUpOrPersonal === "Sign Up")
+      this.isSignupModalOpen = !this.isSignupModalOpen;
+    else
+      this.isPersonalOpen = !this.isPersonalOpen;
+  }
   closeSignupModal()
   {
     this.isSignupModalOpen = false;
@@ -57,7 +82,10 @@ export class Navbar implements OnInit{
   closeLoginModal()
   {
     if (this.client.getLoggedInStatus())
+    {
       this.currentLoginMessage = this.logoutMessage;
+      this.signUpOrPersonal = "Personal Account";
+    }
     this.isLoginModalOpen = false;
   }
   LogInLogOut()
@@ -66,6 +94,7 @@ export class Navbar implements OnInit{
       this.isLoginModalOpen = !this.isLoginModalOpen;
     else
     {
+      this.signUpOrPersonal = "Sign Up";
       this.client.setLoggedInStatus(false);
       this.client.setUserName("Guest");
       sessionStorage.clear();

@@ -15,6 +15,8 @@ import { PopupMessageModel } from '../models/popup-message-model';
 import { EmailChangeModel } from '../models/email-change-model';
 import { UsernameChangeModel } from '../models/username-change-model';
 import { PasswordChangeModel } from '../models/password-change-model';
+import { ClientLeagueModel } from '../models/client-league-model';
+import { PersonalDetails } from '../models/personal-details';
 @Injectable({
   providedIn: 'root'
 })
@@ -80,6 +82,10 @@ export class Client {
   public search(query:string): Observable<(string | null)[] | null>
   {
     return this.http.get<(string | null)[] | null>(this.serverUrl+"Search/"+query);
+  }
+  public getLeague():Observable<ClientLeagueModel[] | null>
+  {
+    return this.http.get<ClientLeagueModel[] | null>(this.serverUrl+"League"); 
   }
   public getLoggedUsersForChat():Observable<ReturnLoggedUsersModel[] | null>
   {
@@ -148,5 +154,9 @@ export class Client {
   public changePassword(newPassword: PasswordChangeModel):Observable<void>
   {
     return this.http.patch<void>(this.serverUrl+"Password",newPassword);
+  }
+  public getPersonalInfo():Observable<PersonalDetails>
+  {
+    return this.http.get<PersonalDetails>(this.serverUrl+"User");
   }
 }

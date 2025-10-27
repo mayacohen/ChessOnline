@@ -2,13 +2,12 @@
   <div class="modal-content">
     <button #closeButton class="close-btn" (click)="closeModal($event)">&times;</button>
     <div class="container">
-      <!--  -->
         <div class="profile-container">
           <h2 class="profile-title">Account Settings</h2>
           <div class="user-info">
-            <h3>Username:</h3>
+            <h3>Username: {{user.username}}</h3>
             <div class="user-details">
-              <img src="example.png" alt="User Avatar" class="avatar" />
+              <img [src]='user.userPic' alt="User Avatar" class="avatar" />
               @if (!isGoogleFacebook) {
                 <button class="fancy-text" (click)="toggleUsernameForm()">Change username</button>
               }
@@ -41,7 +40,7 @@
             </form>
           }
           <div class="email-section">
-            <h3>Email:</h3>
+            <h3>Email: {{user.Email}}</h3>
             @if (!isGoogleFacebook) {
               <button class="fancy-text" (click)="toggleEmailForm()">Change email</button>
             }
@@ -105,46 +104,46 @@
           </form>
         }
       </div>
-      <p>Date joined:</p>
+      <p>Date joined: {{user.dateJoined}}</p>
       <button class="fancy-text">Change password</button>
-      <div>Scrore: N/A</div>
-      <div>Games won</div>
-      <div>Games lost</div>
-      <div>Games tied</div>
+      <div>Scrore: {{user.score}}</div>
+      <div>Games won: {{user.gamesWon}}</div>
+      <div>Games lost: {{user.gamesLost}}</div>
+      <div>Games tied: {{user.gamesDraw}}</div>
       <div class="avatar-section">
         <p>Switch avatar</p>
         <div class="picture-grid">
-          @if(tempUserPic != 'icon1.png') 
+          @if(user.userPic != 'icon1.png') 
           {
             <div (click)='switchAvatar(1)'>
               <img src="icon1.png" alt="optional avatar num.1">
             </div>
           }
-          @if(tempUserPic != 'icon2.png') 
+          @if(user.userPic != 'icon2.png') 
           {
             <div (click)='switchAvatar(2)'>
               <img src="icon2.png" alt="optional avatar num.2">
             </div>
           }
-          @if(tempUserPic != 'icon3.png') 
+          @if(user.userPic != 'icon3.png') 
           {
             <div (click)='switchAvatar(3)'>
               <img src="icon3.png" alt="optional avatar num.3">
             </div>
           }
-          @if(tempUserPic != 'icon4.png') 
+          @if(user.userPic != 'icon4.png') 
           {
             <div (click)='switchAvatar(4)'>
               <img src="icon4.png" alt="optional avatar num.4">
             </div>
           }
-          @if(tempUserPic != 'icon5.png') 
+          @if(user.userPic != 'icon5.png') 
           {
             <div (click)='switchAvatar(5)'>
               <img src="icon5.png" alt="optional avatar num.5">
           </div>
           }
-          @if(tempUserPic != 'icon6.png') 
+          @if(user.userPic != 'icon6.png') 
           {
             <div (click)='switchAvatar(6)'>
               <img src="icon6.png" alt="optional avatar num.6">

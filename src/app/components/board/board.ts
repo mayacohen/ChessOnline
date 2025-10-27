@@ -436,7 +436,8 @@ export class Board implements OnInit, AfterViewInit{
       if (returnString.retValue === "Retry")
       {
         this.client.retryMove(message).subscribe({
-          error: err =>  {
+          next: () => this.isWhiteTurn = !this.isWhiteTurn,
+          error: () =>  {
             this.setGameOver("Lost Connectivity");
           }
         });

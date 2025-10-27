@@ -3,7 +3,7 @@
     <app-chat [userChat]="userChat" (closeChatModal)='closeChatModal()'>
     </app-chat>
 }
- @else if(isRequestConfirmation)
+ @else if(isRequestModal)
 {
     <app-request-game-modal [inputUser]="user.username"
     (resultEmitter)="closeGameRequestModal()">
@@ -56,7 +56,7 @@
                 <div class="centered">
                     @if(isLogged && user.isOnline)
                     {
-                        <button class="fancy-text">Request game!</button>
+                        <button class="fancy-text" (click)="openRequestModal()">Request game!</button>
                     }
                 </div>
             </div>

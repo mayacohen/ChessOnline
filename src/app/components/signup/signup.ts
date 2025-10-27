@@ -12,7 +12,7 @@ import { FacebookSignup } from '../facebook-signup/facebook-signup';
 
 @Component({
   selector: 'app-signup',
-  imports: [FormsModule, ReactiveFormsModule, GoogleSignup, FacebookSignup],
+  imports: [FormsModule, ReactiveFormsModule/*, GoogleSignup, FacebookSignup*/],
   templateUrl: './signup.html',
   styleUrl: './signup.scss'
 })
