@@ -1,95 +1,53 @@
-// .league-container {
-//   width: 100%;
-//   max-width: 500px;
-//   margin: 0 auto;
-//   border-collapse: collapse;
-//   border: 1px solid #ddd;
-//   font-family: Arial, sans-serif;
-// }
-// .league-container {
-//   width: 100%;
-//   max-width: 600px;
-//   margin: 20px auto;
-//   font-family: Arial, sans-serif;
-  
-//   border-radius: 6px;
-//   overflow: hidden;
-// }
-
-// .league-row {
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   background-color: #fafafa;
-//   border-bottom: 1px solid #ddd;
-//   padding: 8px 12px;
-//   transition: background-color 0.3s ease;
-// }
-
-// .league-row:hover {
-//   background-color: #f0f0f0;
-// }
-
-// .highlight {
-//   background-color: #e0f7fa !important;
-//   font-weight: bold;
-// }
-
-// .user-pic {
-//   border-radius: 50%;
-//   object-fit: cover;
-//   width: 40px;
-//   height: 40px;
-// }
-
-// .username {
-//   flex: 1;
-//   margin-left: 12px;
-// }
-
-// .score {
-//   width: 60px;
-//   text-align: right;
-//   font-weight: 500;
-// }
-.fake-modal
-{
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    z-index: 200;
-    left: 0;
-    top: 0;
-    background: rgba(30, 30, 30, 0.55);
-    backdrop-filter: blur(4px);    
+/* === Modal === */
+.fake-modal {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 200;
+  left: 0;
+  top: 0;
+  background: rgba(30, 30, 30, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.fake-modal-content
-{
-    background-color: rgb(246, 236, 218);
-    color: #333;
+
+.fake-modal-content {
+  background-color: rgb(246, 236, 218);
+  color: #333;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh; /* limit height for scroll inside */
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
-#returnButton
-{
-    position: absolute;
-    font-size: 3rem;
-    top: 40px;
-    left: 40px;
-    color: rgb(227, 160, 36);
+
+/* Return Button */
+#returnButton {
+  position: absolute;
+  font-size: 2.5rem;
+  top: 20px;
+  left: 20px;
+  color: rgb(227, 160, 36);
+  cursor: pointer;
 }
+
+/* === League Layout === */
 .league-container {
   width: 100%;
-  max-width: 600px;
-  margin: 20px auto;
+  margin-top: 60px; /* space for back button */
   font-family: Arial, sans-serif;
   border: 1px solid #ddd;
   border-radius: 6px;
   overflow: hidden;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 100px; /* username column + fixed score column */
-  align-items: center;
+  background: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .league-header {
@@ -101,6 +59,32 @@
   border-bottom: 1px solid #ddd;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 100px; /* username + score */
+  align-items: center;
+}
+
+/* Scrollable player list */
+.league-body {
+  overflow-y: auto;
+  flex: 1;
+  max-height: 50vh; /* scroll area size inside modal */
+}
+
+/* Scrollbar style (optional) */
+.league-body::-webkit-scrollbar {
+  width: 8px;
+}
+.league-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+.league-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* === Rows === */
 .league-row {
   padding: 8px 16px;
   border-bottom: 1px solid #eee;
@@ -120,12 +104,11 @@
   font-weight: bold;
 }
 
-/* Columns */
+/* === Columns === */
 .col-user {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 0; /* allows ellipsis to work properly */
 }
 
 .user-pic {
@@ -133,7 +116,6 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .username {
@@ -146,4 +128,10 @@
   text-align: right;
   font-weight: 500;
   color: #333;
+}
+
+.empty-message {
+  text-align: center;
+  margin: 20px 0;
+  color: #555;
 }

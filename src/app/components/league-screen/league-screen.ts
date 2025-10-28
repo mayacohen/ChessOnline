@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output} from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, ChangeDetectorRef} from '@angular/core';
 import { ClientLeagueModel } from '../../models/client-league-model';
 import { CommonModule } from '@angular/common';
 import { Client } from '../../services/client';
@@ -12,10 +12,12 @@ import { Client } from '../../services/client';
 export class LeagueScreen implements OnInit{
   leagueResults!: ClientLeagueModel[] | null;
   @Output() exit = new EventEmitter<void>();
-  constructor(private client:Client){}
+  constructor(private client:Client, private cdr:ChangeDetectorRef){}
   ngOnInit(): void {
     this.client.getLeague().subscribe({
-      next: res => this.leagueResults = res,
+      next: res => {this.leagueResults = res;
+        this.cdr.detectChanges();
+      },
       error : err => console.log(err)
     });
   }

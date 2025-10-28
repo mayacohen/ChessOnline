@@ -84,7 +84,7 @@ export class Navbar implements OnInit{
     if (this.client.getLoggedInStatus())
     {
       this.currentLoginMessage = this.logoutMessage;
-      this.signUpOrPersonal = "Personal Account";
+      this.signUpOrPersonal = "Account";
     }
     this.isLoginModalOpen = false;
   }

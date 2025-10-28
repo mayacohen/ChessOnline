@@ -3,7 +3,7 @@ export interface PersonalDetails {
     score : number | null;
     userPic : string;
     dateJoined: string;
-    Email: string;
+    email: string;
     gamesWon:number ; 
     gamesLost:number ;
     gamesDraw:number ;

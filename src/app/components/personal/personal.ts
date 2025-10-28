@@ -29,7 +29,7 @@ export class Personal implements OnInit{
   isEmailTaken = false;
   isUserNameTaken = false;
   user : PersonalDetails = {username:"", userPic:"example.pmg", score:null,
-    gamesDraw:0, gamesLost:0, gamesWon:0, dateJoined:"",Email:""};
+    gamesDraw:0, gamesLost:0, gamesWon:0, dateJoined:"",email:""};
   constructor(private client:Client, private cdr:ChangeDetectorRef,
     private fb:FormBuilder){}
   ngOnInit(): void {
@@ -93,6 +93,7 @@ export class Personal implements OnInit{
         next: () => 
           {
             this.user.userPic = newImg;
+            this.client.setUserPic(newImg);
             this.cdr.detectChanges();
           },
         error: err => console.log(err)
@@ -112,7 +113,7 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.isEmailTaken = false;
-        this.user.Email = emailModel.email;
+        this.user.email = emailModel.email;
         this.showEmailForm= false;
         this.cdr.detectChanges();
       },

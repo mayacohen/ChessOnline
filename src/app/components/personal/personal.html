@@ -40,7 +40,7 @@
             </form>
           }
           <div class="email-section">
-            <h3>Email: {{user.Email}}</h3>
+            <h3>Email: {{user.email}}</h3>
             @if (!isGoogleFacebook) {
               <button class="fancy-text" (click)="toggleEmailForm()">Change email</button>
             }
@@ -105,8 +105,7 @@
         }
       </div>
       <p>Date joined: {{user.dateJoined}}</p>
-      <button class="fancy-text">Change password</button>
-      <div>Scrore: {{user.score}}</div>
+      <div>Score: {{user.score}}</div>
       <div>Games won: {{user.gamesWon}}</div>
       <div>Games lost: {{user.gamesLost}}</div>
       <div>Games tied: {{user.gamesDraw}}</div>
