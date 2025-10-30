@@ -7,6 +7,7 @@ import { LoggedInUserModel } from '../../models/logged-in-user-model';
 import { ClientMessageModel } from '../../models/client-message-model';
 import { WebsocketService } from '../../services/websocket-service';
 import { PopupMessageModel } from '../../models/popup-message-model';
+import { timeout } from 'rxjs';
 @Component({
   selector: 'app-chat',
   imports: [CommonModule, FormsModule],
@@ -79,7 +80,19 @@ export class Chat implements OnInit{
           this.newMessageContent = "";
           this.cdr.detectChanges();
         }),
-        error: err => console.log(err)
+        error: err => {console.log(err);
+          setTimeout(() => {
+              this.client.sendMessageToUser(message).subscribe({
+                next: (() =>{
+                  message.date = new Date().toISOString();
+                  this.messages.push(message);
+                  this.newMessageContent = "";
+                  this.cdr.detectChanges();
+                }),
+                error: err => console.log(err)
+              });
+          }, 500);
+        }
       });
     }
   }

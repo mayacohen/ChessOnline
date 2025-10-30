@@ -25,6 +25,12 @@ export class RequestGameModal implements OnInit{
   @Output() resultEmitter = new EventEmitter<void>(); 
   emptyMessage = "Loading Users..";
   constructor (private client:Client, private cdr: ChangeDetectorRef){}
+  getAvailablePlayersNext(list: string[])
+  {
+    this.activeUsers = list;
+    this.emptyMessage = "No one is online right now";
+    this.cdr.detectChanges();
+  }
   ngOnInit(): void {
     if (this.inputUser !== null)
     {
@@ -38,14 +44,23 @@ export class RequestGameModal implements OnInit{
     else
     {
       this.client.getAvailablePlayers().subscribe({
-      next: list => 
-        {
-          this.activeUsers = list;
-          this.emptyMessage = "No one is online right now";
-          this.cdr.detectChanges();
-        },
-      error: err => console.log(err)
-    });
+        next: list => this.getAvailablePlayersNext(list),
+        error: () => {
+          setTimeout(()=>{
+            this.client.getAvailablePlayers().subscribe({
+              next: list => this.getAvailablePlayersNext(list),
+              error:() => {
+                this.emptyMessage = "Loading is taking some time.";
+                setTimeout(()=>{
+                  this.client.getAvailablePlayers().subscribe({
+                    next: list => this.getAvailablePlayersNext(list),
+                    error:() => {this.emptyMessage = "Something went wrong. Please try again later.";
+                      const h3s = document.getElementsByTagName('H3');
+                      h3s[0].className="text-danger";
+                    }
+                  })},2000)} 
+            })},100);
+      }});
     this.client.rejectedResponseUser.subscribe({
       next: rejctedUserName => {
         this.isWaitModalOpen = false;

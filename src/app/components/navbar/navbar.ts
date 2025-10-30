@@ -100,14 +100,26 @@ export class Navbar implements OnInit{
       sessionStorage.clear();
       localStorage.clear();
       this.currentLoginMessage = this.loginMessage;
-      this.client.activate().subscribe({next: response =>
-      {
-        sessionStorage.setItem("accessToken", response.accessToken);
-        localStorage.setItem("refreshToken", response.refreshToken); 
-      },
-      error: err => console.log(err)
-    });
+      this.recoursiveActivate(100);
     }
+  }
+  recoursiveActivate(time:number)
+  {
+    if (time > 5000)
+    {
+      console.log("Server down");
+      return;
+    }
+    this.client.activate().subscribe({next: response =>
+        this.setTokens(response),
+      error: () => {
+          setTimeout(() => this.recoursiveActivate(time+100),time);
+      }});
+  }
+  setTokens(response:any)
+  {
+    sessionStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("refreshToken", response.refreshToken); 
   }
   handleSocial()
   {
@@ -129,17 +141,13 @@ export class Navbar implements OnInit{
       this.client.search(query).subscribe({
           next: userlist => {
             if (userlist != null)
-            {
               this.userList = userlist;
-            }
             else
-            {
               this.userList = [];
-            }
             this.isSearchModalOpen = true;
             this.cdr.detectChanges();
             },
-          error: err => console.log(err) 
+          error: err => this.userList = [] 
       });
     }
     else

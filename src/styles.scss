@@ -33,7 +33,7 @@ button:hover
 {
     @include modal-content-base;
     height: fit-content;
-    width: 400px;
+    width: 90%;
     background-color: white;
     color: black;
     display: flex;
@@ -128,4 +128,10 @@ button:hover
 {
   color: rgba(255, 0, 0, 0.701);
   font-weight: 700;
+}
+@media screen and (min-width:450px){
+  .modal-content
+  {
+    width: 400px;
+  }
 }

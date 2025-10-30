@@ -30,12 +30,15 @@ export class Main implements OnInit, OnDestroy{
   constructor (private client:Client, private ws: WebsocketService,
     private cdr:ChangeDetectorRef){}
   ngOnInit(): void {
-    this.client.activate().subscribe({
-      next: response =>
-      {
-        sessionStorage.setItem("accessToken", response.accessToken);
-        localStorage.setItem("refreshToken", response.refreshToken); 
-        this.ws.connect(response.accessToken);
+    localStorage.clear();
+    this.recoursiveActivate(100);
+    this.isUserLoggedIn = this.client.getLoggedInStatus(); 
+  }
+  setTokens(response:any)
+  {
+    sessionStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("refreshToken", response.refreshToken); 
+     this.ws.connect(response.accessToken);
         setTimeout(() => this.ws.getMessages().subscribe({
           next: m => 
           {
@@ -53,13 +56,24 @@ export class Main implements OnInit, OnDestroy{
           },
           error: err => console.log(err)   
         }), 1000);
-      },
-      error: err => console.log(err)
-    });
-    this.isUserLoggedIn = this.client.getLoggedInStatus(); 
   }
+  recoursiveActivate(time:number)
+  {
+    if (time > 5000)
+    {
+      console.log("Server down");
+      return;
+    }
+    this.client.activate().subscribe({next: response =>
+        this.setTokens(response),
+      error: () => {
+          setTimeout(() => this.recoursiveActivate(time+100),time);
+      }});
+  }
+
   ngOnDestroy(): void {
     this.ws.closeConnection();
+    localStorage.clear();
   }
   gameResponseHandler(message:ClientServerMessage)
   {
@@ -110,7 +124,7 @@ export class Main implements OnInit, OnDestroy{
     this.message = message;
     if (message.content !== null)
       this.timer= parseInt(message.content);
-    this.client.setUserName(message.receiverUserName?? "bug");
+    //this.client.setUserName(message.receiverUserName?? "bug");
     this.userGame = message.senderUserName;
     this.client.isGameRequestPopUp.next(true);
     this.isRequestConfirmation = true;

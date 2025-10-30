@@ -1,11 +1,26 @@
+:host
+{
+    width: 100%;
+}
 .container
 {
     // change to grid 1 small col, two stacking rows
     display: flex; 
     flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    height: fit-content;
     img
     {
         height: 40px;
         width: 40px;
+    }
+    h3
+    {
+        white-space: nowrap;
+        margin: 0;
+        white-space: pre;
+        display: flex;
+        align-self: center;
     }
 }

@@ -93,7 +93,7 @@ export class Board implements OnInit, AfterViewInit{
   setPlayerDetails()
   {
     const thisPlayer : ActiveUserModel = {
-      username : "You: " + this.client.getUserName(),
+      username : "You:  " + this.client.getUserName(),
       userImg : this.client.getUserPic(),
       score : null //missing
     };

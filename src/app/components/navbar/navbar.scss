@@ -38,7 +38,7 @@ button:hover, .navbar-item:hover
 .small-layout
 {
     height: var(--height-top-navbar);
-    width: 100%;
+    width: calc(100% - 20px);
     display: flex; 
     align-items: center;
     position: fixed;

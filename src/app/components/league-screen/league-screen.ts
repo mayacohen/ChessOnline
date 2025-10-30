@@ -12,14 +12,25 @@ import { Client } from '../../services/client';
 export class LeagueScreen implements OnInit{
   leagueResults!: ClientLeagueModel[] | null;
   @Output() exit = new EventEmitter<void>();
+  emptyMessage = 'Start playing and enter the league!';
   constructor(private client:Client, private cdr:ChangeDetectorRef){}
   ngOnInit(): void {
-    this.client.getLeague().subscribe({
-      next: res => {this.leagueResults = res;
-        this.cdr.detectChanges();
-      },
-      error : err => console.log(err)
-    });
+    this.recoursiveGetLeague(100);
+  }
+  recoursiveGetLeague(time:number)
+  {
+    if (time > 5000)
+    {
+      this.emptyMessage = "Encountering some difficulties retriving the data, "
+      "try again later";
+      return;
+    }
+    this.client.getLeague().subscribe({next: res =>
+        this.leagueResults = res,
+      error: () => {
+          this.emptyMessage = "Loading users...";
+          setTimeout(() => this.recoursiveGetLeague(time+100),time);
+      }});
   }
   exitScreen()
   {
