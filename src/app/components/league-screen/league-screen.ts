@@ -19,10 +19,11 @@ export class LeagueScreen implements OnInit{
   }
   recoursiveGetLeague(time:number)
   {
-    if (time > 5000)
+    if (time > 1000)
     {
       this.emptyMessage = "Encountering some difficulties retriving the data, "
       "try again later";
+      this.cdr.detectChanges();
       return;
     }
     this.client.getLeague().subscribe({next: res =>

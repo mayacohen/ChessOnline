@@ -1,4 +1,5 @@
 import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserView } from '../user-view/user-view';
 import { LoggedUserReturnModel } from '../../models/logged-user-return-model';
@@ -15,18 +16,26 @@ export class SearchModal {
   @Input() user: LoggedUserReturnModel = {isFriend:null, isOnline:false, 
     dateJoined:"",userPic:"example.png",username:'guest', score:null}; 
   isUserView = false;
-    constructor(private client:Client, private cdr:ChangeDetectorRef){}
-  openUserView(username:string | null)
+    constructor(private client:Client, private cdr:ChangeDetectorRef,
+      private router:Router){}
+  openUserView(user:any)
   {
-    if (username === null) return;
-    this.client.getLoggedUserDetails(username).subscribe({
-      next: user => {
-        this.user = user;
-        this.isUserView = true;
-        this.cdr.detectChanges();
-      },
-      error: err => console.log(err)
-    });
+    this.user = user;
+    this.isUserView = true;
+    this.cdr.detectChanges();
+  }
+  recoursiveOpenUserView(username:string | null, time:number)
+  {
+    if (time > 1000 || username === null)
+    {
+      this.router.navigate(["/error"]); 
+      return;
+    }
+    this.client.getLoggedUserDetails(username).subscribe({next: user =>
+        this.openUserView(user),
+      error: () => {
+          setTimeout(() => this.recoursiveOpenUserView(username,time+100),time);
+      }});
   }
   closeUserView()
   {

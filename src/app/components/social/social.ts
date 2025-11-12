@@ -20,19 +20,32 @@ export class Social implements OnInit{
   userChat: LoggedInUserModel = {username : '', 
     userImg: 'example.png', id:'', score:0};
   emptyMessage = "Loading Users..";
-
+  setContent(res:any)
+  {
+    this.loggedUsers = res;
+    this.emptyMessage = "Invite your friends to join!";
+    this.cdr.detectChanges();
+  }
   constructor(private client:Client, private cdr: ChangeDetectorRef){}
   ngOnInit(): void {
     this.client.getLoggedUsersForChat().subscribe({
       next: res => 
-        {
-          this.loggedUsers = res;
-          this.emptyMessage = "Invite your friends to join!";
-          this.cdr.detectChanges();
-        },
-      error: err => console.log(err) 
-    });
-  }
+          this.setContent(res),
+        error: () => {
+          setTimeout(()=>{
+            this.client.getLoggedUsersForChat().subscribe({
+              next: res => this.setContent(res),
+              error:() => {
+                this.emptyMessage = "Loading is taking some time.";
+                setTimeout(()=>{
+                  this.client.getLoggedUsersForChat().subscribe({
+                    next: res => this.setContent(res),
+                    error:() => {this.emptyMessage = "Invite your friends to join!";
+                                this.cdr.detectChanges();
+                    }
+                  })},2000)} 
+            })},100);
+  }})}
   closeChatModal()
   {
     this.isChatModalOpen = false;

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit , ChangeDetectorRef, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Client } from '../../services/client';
 import { CommonModule } from '@angular/common';
 import { LoggedUserReturnModel } from '../../models/logged-user-return-model';
@@ -12,17 +13,15 @@ import { RequestGameModal } from '../request-game-modal/request-game-modal';
   styleUrl: './user-view.scss'
 })
 export class UserView implements OnInit{
-  // notFriend = "bi bi-star";
-  // friend = "bi bi-star-fill";
   @Output() closeModalEmitter = new EventEmitter<void>();
   @Input() user: LoggedUserReturnModel = {isFriend:null, isOnline:false, 
     dateJoined:"",userPic:"example.png",username:'guest', score:null}; 
-//  userStatus = this.user.isFriend? this.friend : this.notFriend;
     userChat: LoggedInUserModel = {username : '', 
       userImg: 'example.png', id:'', score:0};
   isChatModalOpen = false;
   isRequestModal = false;
-  constructor(private client:Client, private cdr:ChangeDetectorRef){}
+  constructor(private client:Client, private cdr:ChangeDetectorRef,
+    private router:Router){}
   isLogged = false;
   ngOnInit(): void {
     if (this.client.getLoggedInStatus())
@@ -47,10 +46,6 @@ export class UserView implements OnInit{
   {
     this.isChatModalOpen = false;
   }
-  // handleRequestConfirmation($event)
-  // {
-
-  // }
   openChatModal()
   {
     this.isChatModalOpen = true;
@@ -73,10 +68,9 @@ export class UserView implements OnInit{
         next: () => 
           {
             this.user.isFriend = false;
-       //     this.userStatus = this.notFriend;
             this.cdr.detectChanges(); 
           },
-          error: err => console.log(err)
+          error: err => this.router.navigate(['/error'])
       });
     }
     else
@@ -85,10 +79,9 @@ export class UserView implements OnInit{
         next: () => 
           {
             this.user.isFriend = true;
-            // this.userStatus = this.friend;
             this.cdr.detectChanges(); 
           },
-          error: err => console.log(err)
+          error: err => this.router.navigate(['/error'])
       });
     }
   }

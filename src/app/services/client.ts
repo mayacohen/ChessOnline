@@ -87,7 +87,6 @@ export class Client {
   {
     return this.http.get<ClientLeagueModel[] | null>(this.serverUrl+"League"); 
   }
-  ///here 
   public getLoggedUsersForChat():Observable<ReturnLoggedUsersModel[] | null>
   {
     return this.http.get< ReturnLoggedUsersModel[] | null>(this.serverUrl + "LoggedUsers");
@@ -96,7 +95,7 @@ export class Client {
   {
     return this.http.post<void>(this.serverUrl,message);
   }
-  public getConversationWithParter(partner:string):Observable<ClientConversationModel>
+  public getConversationWithPartner(partner:string):Observable<ClientConversationModel>
   {
     return  this.http.get<ClientConversationModel>(this.serverUrl+"Chat/"+partner);
   }

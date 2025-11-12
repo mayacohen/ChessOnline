@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef, Output, EventEmitter, 
   Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Client } from '../../services/client';
 import { CommonModule } from '@angular/common';
 import { FormGroup,FormsModule, FormBuilder,Validators,
@@ -23,6 +24,10 @@ export class Personal implements OnInit{
   emailForm!: FormGroup;
   passwordForm!: FormGroup;
   userNameForm!: FormGroup;
+  isEmailError = false;
+  isAvatarError = false;
+  isPasswordError = false;
+  isUserNameError = false;
   showEmailForm = false;
   showUsernameForm = false;
   showPasswordForm = false;
@@ -31,14 +36,24 @@ export class Personal implements OnInit{
   user : PersonalDetails = {username:"", userPic:"example.pmg", score:null,
     gamesDraw:0, gamesLost:0, gamesWon:0, dateJoined:"",email:""};
   constructor(private client:Client, private cdr:ChangeDetectorRef,
-    private fb:FormBuilder){}
+    private fb:FormBuilder, private router:Router){}
+  recoursiveGetPersonalInfo(time:number)
+  {
+    if (time > 1000)
+    {
+      console.log("Server down");
+      this.router.navigate(['/error']);
+      return;
+    }
+    this.client.getPersonalInfo().subscribe({next: info =>
+        {this.user = info;
+        this.cdr.detectChanges();},
+      error: () => {
+          setTimeout(() => this.recoursiveGetPersonalInfo(time+100),time);
+      }});
+  }
   ngOnInit(): void {
-    this.client.getPersonalInfo().subscribe({
-      next: info => {this.user = info;
-        this.cdr.detectChanges();
-      },
-      error : err => console.log(err)
-    });
+    this.recoursiveGetPersonalInfo(100);
     this.emailForm = this.fb.group({
       email:['', Validators.required, Validators.email]      
     });
@@ -93,10 +108,11 @@ export class Personal implements OnInit{
         next: () => 
           {
             this.user.userPic = newImg;
+            this.isAvatarError = false;
             this.client.setUserPic(newImg);
             this.cdr.detectChanges();
           },
-        error: err => console.log(err)
+        error: err => this.isAvatarError = true
       });
     }
   }
@@ -113,11 +129,17 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.isEmailTaken = false;
+        this.isEmailError = false;
         this.user.email = emailModel.email;
         this.showEmailForm= false;
+        this.emailForm.reset();
         this.cdr.detectChanges();
       },
-      error: () => this.isEmailTaken = true
+      error: err => {
+        if (err.status == 500 || err.status == 401)
+          this.isEmailError = true;
+        else
+          this.isEmailTaken = true;}
     }); 
   }
   onChangeUsername() 
@@ -129,11 +151,17 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.isUserNameTaken = false;
+        this.isUserNameError = false;
         this.user.username = usernameModel.userName;
         this.showUsernameForm= false;
+        this.userNameForm.reset();
         this.cdr.detectChanges();
       },
-      error: () => this.isUserNameTaken = true
+      error: err => {
+        if (err.status == 500 || err.status == 401)
+          this.isUserNameError = true;
+        else
+          this.isUserNameTaken = true;}
     }); 
   }
   onChangePassword() 
@@ -146,9 +174,11 @@ export class Personal implements OnInit{
       next: () =>
       {
         this.showPasswordForm = false;
+        this.isPasswordError = false;
+        this.passwordForm.reset();
         this.cdr.detectChanges();
       },
-      error: err => console.log(err)
+      error: err => this.isPasswordError = true
     }); 
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Navbar } from '../../components/navbar/navbar';
 import { Board } from '../../components/board/board';
 import { CommonModule } from '@angular/common';
@@ -28,11 +29,25 @@ export class Main implements OnInit, OnDestroy{
   userGame = "";
   timer = 0; //reset at end of game;
   constructor (private client:Client, private ws: WebsocketService,
-    private cdr:ChangeDetectorRef){}
+    private cdr:ChangeDetectorRef, private router:Router){}
   ngOnInit(): void {
     localStorage.clear();
     this.recoursiveActivate(100);
     this.isUserLoggedIn = this.client.getLoggedInStatus(); 
+  }
+  handleWebSocketMesseges(m:any)
+  {
+    console.log(m);
+    if ('type' in m && m.type === 'Chat Request')
+      this.handleNewMessage(m);
+    if ('type' in m && m.type === "Game Request")
+      this.handleGameRequest(m);
+    //Game response, move, chat?
+    if ('type' in m && m.type === "Game Response")//start game
+      this.gameResponseHandler(m);
+    if ('type' in m && (m.type === "Lose" || m.type === "Draw" || 
+      m.type === "Move" || m.type === "Promotion"))
+    this.client.newServerGameData.next(m);
   }
   setTokens(response:any)
   {
@@ -41,26 +56,28 @@ export class Main implements OnInit, OnDestroy{
      this.ws.connect(response.accessToken);
         setTimeout(() => this.ws.getMessages().subscribe({
           next: m => 
-          {
-            console.log(m);
-            if ('type' in m && m.type === 'Chat Request')
-              this.handleNewMessage(m);
-            if ('type' in m && m.type === "Game Request")
-              this.handleGameRequest(m);
-            //Game response, move, chat?
-            if ('type' in m && m.type === "Game Response")//start game
-              this.gameResponseHandler(m);
-            if ('type' in m && (m.type === "Lose" || m.type === "Draw" || 
-              m.type === "Move" || m.type === "Promotion"))
-              this.client.newServerGameData.next(m);
-          },
-          error: err => console.log(err)   
-        }), 1000);
+            this.handleWebSocketMesseges(m),
+          error: () => {
+            this.ws.connect(response.accessToken);
+             setTimeout(() => this.ws.getMessages().subscribe({
+          next: m => 
+            this.handleWebSocketMesseges(m),
+          error: () => {
+            this.ws.connect(response.accessToken);
+             setTimeout(() => this.ws.getMessages().subscribe({
+          next: m => 
+            this.handleWebSocketMesseges(m),
+          error: () => {
+            this.router.navigate(['/error']);
+          }  
+        }), 1000)}})
+          , 1000)}}),1000);
   }
   recoursiveActivate(time:number)
   {
-    if (time > 5000)
+    if (time > 1000)
     {
+      this.router.navigate(['/error']);
       console.log("Server down");
       return;
     }
@@ -70,7 +87,6 @@ export class Main implements OnInit, OnDestroy{
           setTimeout(() => this.recoursiveActivate(time+100),time);
       }});
   }
-
   ngOnDestroy(): void {
     this.ws.closeConnection();
     localStorage.clear();

@@ -1,4 +1,5 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Signup } from '../signup/signup';
 import { CommonModule } from '@angular/common';
 import { Login } from '../login/login';
@@ -37,7 +38,9 @@ export class Navbar implements OnInit{
       userImg: 'example.png', id:'', score:0};  
   searchQuery=''; //search for users
   userList : (string | null)[] = [];
-  constructor(private client:Client, private cdr: ChangeDetectorRef){}
+  userName = "Guest";
+  constructor(private client:Client, private cdr: ChangeDetectorRef,
+    private router:Router){}
   ngOnInit(): void {
     this.client.isGameRequestPopUp.subscribe({
       next: val => 
@@ -83,6 +86,7 @@ export class Navbar implements OnInit{
   {
     if (this.client.getLoggedInStatus())
     {
+      this.userName = this.client.getUserName();
       this.currentLoginMessage = this.logoutMessage;
       this.signUpOrPersonal = "Account";
     }
@@ -97,6 +101,7 @@ export class Navbar implements OnInit{
       this.signUpOrPersonal = "Sign Up";
       this.client.setLoggedInStatus(false);
       this.client.setUserName("Guest");
+      this.userName = "Guest";
       sessionStorage.clear();
       localStorage.clear();
       this.currentLoginMessage = this.loginMessage;
@@ -105,9 +110,10 @@ export class Navbar implements OnInit{
   }
   recoursiveActivate(time:number)
   {
-    if (time > 5000)
+    if (time > 1000)
     {
       console.log("Server down");
+      this.router.navigate(['/error']);
       return;
     }
     this.client.activate().subscribe({next: response =>

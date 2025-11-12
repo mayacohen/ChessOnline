@@ -1,6 +1,7 @@
 <div class="small-layout">
     <div class="default-small">
         <i class="fa-solid fa-bars" (click)="isHamburgerMenuOpen = !isHamburgerMenuOpen;"></i>
+        <div class="fancy-text">Hello {{userName}}</div>
         <img class="small-pic" src="logo.png" alt="chess logo"/>
     </div>
     <div class="aligned-column">
@@ -51,6 +52,7 @@
 </div>
 <div class="big-layout">
     <img class="logo" src="logo.png" alt="chess logo"/>
+    <div class="fancy-text">Hello {{userName}}</div>
     <button class="fancy-text" (click)="isRequestGameModalOpen = !isRequestGameModalOpen;">Play <i class="fa-solid fa-chess"></i></button>
     <button class="fancy-text" (click) = 'handleSocial()'>Social<img class="small-pic" src="people.png" alt="icon of people in blue"/></button>
     <div class="navbar-item fancy-text" (click)="clickSignUpModal()">{{signUpOrPersonal}}</div>

@@ -27,12 +27,12 @@ export class Chat implements OnInit{
     private websocketService: WebsocketService){}
   ngOnInit(): void {
     this.userName = this.client.getUserName();
-    this.client.getConversationWithParter(this.userChat.username).subscribe({
+    this.client.getConversationWithPartner(this.userChat.username).subscribe({
       next: res => {
         this.messages = res.messages;
         this.cdr.detectChanges();
       },
-      error: err => console.log(err) 
+      error: err => console.log(err) //no matter 
     });
     this.client.newMessage.subscribe({ 
       //also on main - main send here.also open ig. anyway handle

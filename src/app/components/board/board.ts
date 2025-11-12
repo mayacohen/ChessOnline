@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, AfterViewInit, Input,
   ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { GameTracker } from '../game-tracker/game-tracker';
 import { Gamelogic, Utility, Position } from '../../services/gamelogic';
 import { Client } from '../../services/client';
@@ -44,7 +45,7 @@ export class Board implements OnInit, AfterViewInit{
   remainingTime = this.gameTimer;
   currentPickedSquare: string | null = null;
   constructor(private client:Client, private gamelogic:Gamelogic,
-    private cdr: ChangeDetectorRef){}
+    private cdr: ChangeDetectorRef, private router:Router){}
   listOfElemIds: string[] = [];
   ngOnInit(): void {
     //this.player.username = this.client.getUserName();
@@ -103,23 +104,26 @@ export class Board implements OnInit, AfterViewInit{
       score : null //missing
       };
     if (!this.opponentUserName.startsWith('Guest-'))
-    {
-      this.client.getLoggedUserDetails(this.opponentUserName).subscribe({
-        next: user =>
-        {
-          opponent.score = user.score;
-          opponent.userImg = user.userPic; 
-          this.setUsersAsGamePlayers(thisPlayer, opponent);
-        },
-        error : err =>  
-          {
-            console.log(err);
-            this.setUsersAsGamePlayers(thisPlayer, opponent);
-          }
-      });
-    }
+      this.recoursiveGetLoggedUserDetails(opponent, 100);
     else
       this.setUsersAsGamePlayers(thisPlayer, opponent);
+  }
+  recoursiveGetLoggedUserDetails(opponent: ActiveUserModel, time:number)
+  {
+    if (time > 1000)
+    {
+      error: () => this.client.withdrawGame(this.returnCSM("Withdraw","Withdraw")).subscribe({
+        next: () => this.closeBoard.emit(),
+        error: () => this.router.navigate(['/error'])
+      });
+      this.closeBoard.emit();
+    }
+    this.client.getLoggedUserDetails(opponent.username).subscribe({next: user =>
+        {opponent.score = user.score;
+          opponent.userImg = user.userPic; },
+      error: () => {
+          setTimeout(() => this.recoursiveGetLoggedUserDetails(opponent,time+100),time)
+      }});
   }
   setUsersAsGamePlayers(thisPlayer:ActiveUserModel, opponent:ActiveUserModel)
   {
@@ -349,14 +353,25 @@ export class Board implements OnInit, AfterViewInit{
   getChosenPromotion(promotion: string)
   {
     this.isPromotionWindowOpen = false;
-    this.client.setPromotion(this.returnCSM("Promotion", promotion[0])).subscribe({
-      next: () => {
-        this.isWhiteTurn = ! this.isWhiteTurn;
+    this.recoursivePromotion(promotion,this.returnCSM("Promotion", promotion[0]), 100);
+  }
+  recoursivePromotion(promotion: string, message:ClientServerMessage, time:number)
+  {
+    if (time > 1000)
+    {
+      error: () => this.client.withdrawGame(this.returnCSM("Withdraw","Withdraw")).subscribe({
+        next: () => this.closeBoard.emit(),
+        error: () => this.router.navigate(['/error'])
+      });
+      this.closeBoard.emit();
+    }
+    this.client.setPromotion(message).subscribe({next: user =>
+        {this.isWhiteTurn = ! this.isWhiteTurn;
         if (this.promotedSqr !== null && this.promotedSqr.children.length > 0)
-          this.doClientSidePromotion(promotion, this.promotedSqr);
-      }
-      , error: err => console.log(err)
-    });
+          this.doClientSidePromotion(promotion, this.promotedSqr); },
+      error: () => {
+          setTimeout(() => this.recoursivePromotion(promotion,message,time+100),time)
+      }});
   }
   doClientSidePromotion(char: string, parentSqr: HTMLElement)
   {
